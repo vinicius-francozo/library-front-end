@@ -1,0 +1,7 @@
+.LoginForm button {
+  background-color: #ff9e55;
+}
+
+.LoginForm button:hover {
+  background-color: #d7772f !important;
+}

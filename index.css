@@ -1,0 +1,6 @@
+.BackgroundImage {
+  background-image: url("./src/assets/homepage-book.jpg");
+  background-color: rgba(99, 99, 53, 0.884);
+  background-blend-mode: multiply;
+  backdrop-filter: blur(15px);
+}

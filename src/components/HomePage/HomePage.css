@@ -1,0 +1,18 @@
+.HomePage {
+  min-height: 100vh;
+  height: fit-content;
+  background-color: rgba(32, 32, 24, 0.884);
+  background-image: url("../../assets/homepage-book.jpg");
+  background-blend-mode: darken;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.HomeButton {
+  background-color: #ff9e55 !important;
+}
+
+.HomeButton:hover {
+  background-color: #d7772f !important;
+}

@@ -1,0 +1,11 @@
+.ShowUser {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.Content {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(150, 142, 99, 0.932) !important;
+}
