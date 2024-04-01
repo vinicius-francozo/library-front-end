@@ -94,7 +94,7 @@ export default function IndexBook() {
           setPage={setPage}
           rowsPerPage={rowsPerPage}
           setRowsPerPage={setRowsPerPage}
-          count={totalBooks || foundBooks?.length}
+          count={totalBooks || foundBooks?.length || 0}
         />
       </Grid>
       <Snackbar
