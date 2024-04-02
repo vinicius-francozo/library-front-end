@@ -176,7 +176,7 @@ export default function Checkout() {
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {book?.Book.Author.name}
+                        {book?.Book.author.name}
                       </Typography>
                       <Typography
                         textOverflow="ellipsis"

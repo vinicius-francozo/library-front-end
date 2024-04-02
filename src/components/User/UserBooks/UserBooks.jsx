@@ -138,7 +138,7 @@ export default function UserBooks() {
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {rent.Book.Author.name}
+                        {rent.Book.author.name}
                       </Typography>
                       <Typography
                         textOverflow="ellipsis"

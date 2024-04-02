@@ -138,7 +138,7 @@ export default function UserFavorites() {
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {book?.Book.Author?.name}
+                        {book?.Book.author?.name}
                       </Typography>
                       <Box
                         sx={{
