@@ -35,7 +35,7 @@ export default function BookComment({ comment }) {
     >
       <Grid item xs={12}>
         <Typography variant="subtitle2">
-          {comment?.User?.username || "Autor do comentário"}
+          {comment?.user?.username || "Autor do comentário"}
         </Typography>
       </Grid>
       <Grid item xs={12}>
@@ -49,7 +49,7 @@ export default function BookComment({ comment }) {
           value={comment?.rate}
         />
       </Grid>
-      {user?.id === comment?.User?.id && (
+      {user?.id === comment?.user?.id && (
         <Grid item xs={12}>
           <Button
             color="error"

@@ -109,7 +109,7 @@ export default function BookCard(props) {
       >
         <CardHeader
           title={book?.title}
-          subheader={`${book?.Author?.name} ${book?.Author?.surname} - ${book?.Category?.name} - ${new Date(book?.releaseDate).toLocaleDateString()}`}
+          subheader={`${book?.author?.name} ${book?.author?.surname} - ${book?.category?.name} - ${new Date(book?.releaseDate).toLocaleDateString()}`}
           sx={{
             "& div": {
               width: "100%",
