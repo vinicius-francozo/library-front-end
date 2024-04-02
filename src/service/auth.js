@@ -3,7 +3,7 @@ import axios from "axios";
 const login = async (username, password) => {
   try {
     const response = await axios.post(
-      "http://127.0.0.1:3001/auth/login",
+      import.meta.env.VITE_REACT_APP_AUTH_ROUTE,
       {
         username: username,
         password: password,

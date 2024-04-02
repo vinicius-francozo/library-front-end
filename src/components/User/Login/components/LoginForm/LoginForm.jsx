@@ -23,7 +23,10 @@ export default function LoginForm() {
     try {
       setOpen(false);
       const response = await login(data.username, data.password);
-      if (response?.response?.status == 401) {
+      if (
+        response?.response?.status == 401 ||
+        response?.response?.status == 500
+      ) {
         throw new Error();
       }
       localStorage.setItem("token", response);

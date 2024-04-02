@@ -3,7 +3,7 @@ import axios from "axios";
 const token = localStorage.getItem("token");
 
 const libraryFetch = axios.create({
-  baseURL: "http://127.0.0.1:3001",
+  baseURL: import.meta.env.VITE_REACT_APP_BASE_URL_AND_PORT,
   timeout: 10000,
   headers: {
     Authorization: token,
