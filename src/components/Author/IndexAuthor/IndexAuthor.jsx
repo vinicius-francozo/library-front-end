@@ -1,7 +1,7 @@
 import Carousel from "react-material-ui-carousel";
 import { styled } from "@mui/material/styles";
-import { Paper, Box, Typography, Grid } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Paper, Box, Grid } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import { AuthorCard } from "../components";
 import { BackDrop, Pagination, Snackbar } from "../../Utils";
 import { useEffect, useState } from "react";
@@ -75,14 +75,6 @@ export default function IndexAuthor() {
         ))}
       </Carousel>
       <Grid container spacing={5} pl={2} pb={4}>
-        <Grid item xs={12}>
-          <Typography variant="h4" color={"#e1ebf3b8"} pb={3}>
-            Gostaria de cadastrar um autor? Faça isso agora clicando{" "}
-            <Link style={{ color: "inherit" }} to="/author/create">
-              Aqui!
-            </Link>
-          </Typography>
-        </Grid>
         {authors?.map((author) => (
           <AuthorCard key={author.id} author={author} seeMore={true} />
         ))}

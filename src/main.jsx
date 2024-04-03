@@ -72,7 +72,7 @@ const router = createBrowserRouter([
       {
         path: "/book/create",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute isProtected={true}>
             <CreateBook />,
           </ProtectedRoute>
         ),
@@ -96,7 +96,7 @@ const router = createBrowserRouter([
       {
         path: "/author/create",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute isProtected={true}>
             <CreateAuthor />,
           </ProtectedRoute>
         ),

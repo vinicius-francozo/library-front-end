@@ -23,6 +23,7 @@ import { jwtDecode } from "jwt-decode";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context";
 import { getBooksByName, getCheckout } from "../../../service";
+import { Snackbar } from "../../Utils";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -68,6 +69,7 @@ export default function PrimarySearchAppBar() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
+  const [openSnack, setOpenSnack] = useState(false);
   const [cart, setCart] = useState(localStorage.getItem("cartChip") || 0);
 
   const { user, setUser } = useAuth();
@@ -105,9 +107,11 @@ export default function PrimarySearchAppBar() {
   const handleKeyDown = async (event) => {
     if (event.key === "Enter") {
       const response = await getBooksByName(event.target.value);
-      if (response) {
+      if (response?.books?.length) {
         navigate("/book", { state: { foundBooks: response?.books } });
         navigate(0);
+      } else {
+        setOpenSnack(true);
       }
     }
   };
@@ -117,7 +121,9 @@ export default function PrimarySearchAppBar() {
     if (jwtToken) {
       const userInfo = jwtDecode(jwtToken);
       setUser(userInfo);
+      return;
     }
+    setUser(0);
   }, []);
 
   const fetchCartChip = async () => {
@@ -138,18 +144,32 @@ export default function PrimarySearchAppBar() {
         {[
           { label: "Ver Livros", url: "/book" },
           { label: "Ver Autores", url: "/author" },
-        ].map((text) => (
-          <ListItem key={text} disablePadding>
-            <Link
-              style={{ width: "100%", color: "black", textDecoration: "none" }}
-              to={text.url}
-            >
-              <ListItemButton>
-                <ListItemText primary={text.label} />
-              </ListItemButton>
-            </Link>
-          </ListItem>
-        ))}
+          { label: "Criar Livros", url: "/book/create", protected: true },
+          { label: "Criar Autores", url: "/author/create", protected: true },
+        ]
+          .filter((links) => {
+            if (user?.isAdmin) {
+              return links;
+            } else if (!links.protected) {
+              return links;
+            }
+          })
+          .map((text) => (
+            <ListItem key={text} disablePadding>
+              <Link
+                style={{
+                  width: "100%",
+                  color: "black",
+                  textDecoration: "none",
+                }}
+                to={text.url}
+              >
+                <ListItemButton>
+                  <ListItemText primary={text.label} />
+                </ListItemButton>
+              </Link>
+            </ListItem>
+          ))}
       </List>
     </Box>
   );
@@ -339,6 +359,11 @@ export default function PrimarySearchAppBar() {
       <Drawer open={open} onClose={toggleDrawer(false)}>
         {DrawerList}
       </Drawer>
+      <Snackbar
+        message={"Este livro não foi encontrado."}
+        open={openSnack}
+        setOpen={setOpenSnack}
+      />
     </Box>
   );
 }

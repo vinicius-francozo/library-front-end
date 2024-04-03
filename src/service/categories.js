@@ -9,4 +9,13 @@ const getCategories = async () => {
   }
 };
 
-export { getCategories };
+const createCategory = async (data) => {
+  try {
+    const response = await baseURL.post("/categories", { name: data });
+    return response.data;
+  } catch (err) {
+    return err;
+  }
+};
+
+export { getCategories, createCategory };

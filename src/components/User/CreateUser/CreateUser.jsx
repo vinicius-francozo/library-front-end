@@ -1,8 +1,11 @@
 import { Box, Typography } from "@mui/material";
 import "./CreateUser.css";
 import { CreateUserForm } from "./components";
+import { Snackbar } from "../../Utils";
+import { useState } from "react";
 
 export default function CreateUser() {
+  const [open, setOpen] = useState(false);
   return (
     <Box className={"CreateUser"}>
       <Box className={"FormBox"}>
@@ -15,8 +18,13 @@ export default function CreateUser() {
         >
           Crie sua conta!
         </Typography>
-        <CreateUserForm />
+        <CreateUserForm setOpen={setOpen} />
       </Box>
+      <Snackbar
+        message={"Esse nome de usuário já existe."}
+        open={open}
+        setOpen={setOpen}
+      />
     </Box>
   );
 }

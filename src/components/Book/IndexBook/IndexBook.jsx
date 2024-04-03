@@ -1,7 +1,7 @@
 import Carousel from "react-material-ui-carousel";
 import { styled } from "@mui/material/styles";
-import { Paper, Box, Typography, Grid } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Paper, Box, Grid } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import { BookCard } from "../components";
 import { BackDrop, Snackbar, Pagination } from "../../Utils";
 import { useEffect, useState } from "react";
@@ -76,14 +76,6 @@ export default function IndexBook() {
         ))}
       </Carousel>
       <Grid container spacing={5} pl={2} pb={4}>
-        <Grid item xs={12}>
-          <Typography variant="h4" color={"#e1ebf3b8"} pb={3}>
-            Gostaria de cadastrar um livro? Faça isso agora clicando{" "}
-            <Link style={{ color: "inherit" }} to="/book/create">
-              Aqui!
-            </Link>
-          </Typography>
-        </Grid>
         {books?.map((book) => (
           <BookCard key={book.id} book={book} seeMore={true} />
         ))}

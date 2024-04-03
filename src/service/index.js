@@ -18,7 +18,7 @@ export {
   getBooksByName,
 } from "./books";
 
-export { getCategories } from "./categories";
+export { getCategories, createCategory } from "./categories";
 
 export { favorite, getFavorites, unfavorite, getFavorite } from "./favorites";
 

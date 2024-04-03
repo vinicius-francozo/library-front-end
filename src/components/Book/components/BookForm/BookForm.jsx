@@ -7,6 +7,7 @@ import {
   FormControl,
   InputLabel,
   FormHelperText,
+  IconButton,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useForm } from "react-hook-form";
@@ -22,9 +23,12 @@ import {
 } from "../../../../service";
 import { BackDrop, Snackbar } from "../../../Utils";
 import { useNavigate } from "react-router-dom";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { BookFormDialog } from ".";
 
 export default function BookForm({ book, method = "POST" }) {
   const [open, setOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [authorsArray, setAuthorsArray] = useState();
   const [categoriesArray, setCategoriesArray] = useState();
@@ -113,198 +117,213 @@ export default function BookForm({ book, method = "POST" }) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={2} height="auto">
-        <Grid item xs={12}>
-          <TextField
-            id="title"
-            label="Título"
-            sx={{
-              backgroundColor: "#dbb376",
-              borderRadius: 2,
-              minWidth: "100%",
-            }}
-            variant="filled"
-            helperText={errors.title?.message || ""}
-            {...register("title")}
-          />
-        </Grid>
-        <Grid item xs={12} lg={6}>
-          <FormControl fullWidth>
-            <InputLabel id="author">Autor</InputLabel>
-            <Select
-              labelId="author"
-              label="Autor"
-              id="author"
-              value={author}
-              onChange={(e) => {
-                setAuthor(e.target.value);
-                setValue("authorId", e.target.value);
-              }}
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Grid container spacing={2} height="auto">
+          <Grid item xs={12}>
+            <TextField
+              id="title"
+              label="Título"
               sx={{
                 backgroundColor: "#dbb376",
-                minWidth: "100%",
                 borderRadius: 2,
+                minWidth: "100%",
+              }}
+              variant="filled"
+              helperText={errors.title?.message || ""}
+              {...register("title")}
+            />
+          </Grid>
+          <Grid item xs={12} lg={6}>
+            <FormControl fullWidth>
+              <InputLabel id="author">Autor</InputLabel>
+              <Select
+                labelId="author"
+                label="Autor"
+                id="author"
+                value={author}
+                onChange={(e) => {
+                  setAuthor(e.target.value);
+                  setValue("authorId", e.target.value);
+                }}
+                sx={{
+                  backgroundColor: "#dbb376",
+                  minWidth: "100%",
+                  borderRadius: 2,
+                }}
+              >
+                {authorsArray &&
+                  authorsArray.map((author) => (
+                    <MenuItem key={author.id} value={author.id}>
+                      {author.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+              {errors.authorId?.message && (
+                <FormHelperText>{errors.authorId?.message}</FormHelperText>
+              )}
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} lg={6} display="flex" alignItems="center">
+            <FormControl fullWidth>
+              <InputLabel id="category">Categoria</InputLabel>
+              <Select
+                labelId="category"
+                label="Categoria"
+                id="category"
+                value={category}
+                onChange={(e) => {
+                  setCategory(e.target.value);
+                  setValue("categoryId", e.target.value);
+                }}
+                sx={{
+                  backgroundColor: "#dbb376",
+                  minWidth: "100%",
+                  borderRadius: 2,
+                }}
+              >
+                {categoriesArray &&
+                  categoriesArray.map((category) => (
+                    <MenuItem key={category.id} value={category.id}>
+                      {category.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+              {errors.categoryId?.message && (
+                <FormHelperText>{errors.categoryId?.message}</FormHelperText>
+              )}
+            </FormControl>
+            <IconButton
+              size="large"
+              onClick={() => {
+                setOpenDialog(true);
               }}
             >
-              {authorsArray &&
-                authorsArray.map((author) => (
-                  <MenuItem key={author.id} value={author.id}>
-                    {author.name}
-                  </MenuItem>
-                ))}
-            </Select>
-            {errors.author?.message && (
-              <FormHelperText>{errors.author?.message}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} lg={6}>
-          <FormControl fullWidth>
-            <InputLabel id="category">Categoria</InputLabel>
-            <Select
-              labelId="category"
-              label="Categoria"
-              id="category"
-              value={category}
-              onChange={(e) => {
-                setCategory(e.target.value);
-                setValue("categoryId", e.target.value);
-              }}
+              <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
+            </IconButton>
+          </Grid>
+          <Grid item xs={12} lg={6}>
+            <TextField
+              type="number"
+              id="pages"
+              label="Nº de páginas"
               sx={{
                 backgroundColor: "#dbb376",
-                minWidth: "100%",
                 borderRadius: 2,
+                minWidth: "100%",
+              }}
+              variant="filled"
+              helperText={errors.pages?.message || ""}
+              {...register("pages")}
+            />
+          </Grid>
+          <Grid item xs={12} lg={6}>
+            <TextField
+              id="publisher"
+              label="Editora"
+              sx={{
+                backgroundColor: "#dbb376",
+                borderRadius: 2,
+                minWidth: "100%",
+              }}
+              variant="filled"
+              helperText={errors.publisher?.message || ""}
+              {...register("publisher")}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              id="sinopsis"
+              label="Sinópse"
+              multiline
+              rows={4}
+              variant="filled"
+              sx={{
+                backgroundColor: "#dbb376",
+                borderRadius: 2,
+                minWidth: "100%",
+              }}
+              helperText={errors.sinopsis?.message || ""}
+              {...register("sinopsis")}
+            />
+          </Grid>
+          <Grid item xs={12} lg={6}>
+            <TextField
+              id="edition"
+              label="Edição"
+              sx={{
+                backgroundColor: "#dbb376",
+                borderRadius: 2,
+                minWidth: "100%",
+              }}
+              variant="filled"
+              helperText={errors.edition?.message || ""}
+              {...register("edition")}
+            />
+          </Grid>
+          <Grid item xs={12} lg={6}>
+            <TextField
+              type="date"
+              id="releaseDate"
+              label="Data de lançamento"
+              InputLabelProps={{ shrink: true }}
+              sx={{
+                backgroundColor: "#dbb376",
+                borderRadius: 2,
+                minWidth: "100%",
+              }}
+              variant="filled"
+              helperText={errors.releaseDate?.message || ""}
+              {...register("releaseDate")}
+            />
+          </Grid>
+          <Grid item xs={12} lg={6}>
+            <Button
+              className="FileButton"
+              component="label"
+              role={undefined}
+              size="large"
+              variant="contained"
+              tabIndex={-1}
+              startIcon={<CloudUploadIcon />}
+              sx={{
+                backgroundColor: "#dbb376",
+                borderRadius: 2,
+                minWidth: "100%",
+                minHeight: "100%",
+                color: "rgba(0, 0, 0, 0.6)",
               }}
             >
-              {categoriesArray &&
-                categoriesArray.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>
-                    {category.name}
-                  </MenuItem>
-                ))}
-            </Select>
-            {errors.category?.message && (
-              <FormHelperText>{errors.category?.message}</FormHelperText>
+              Capa do livro
+              <input hidden type="file" {...register("cover")} />
+            </Button>
+            {errors.cover?.message && (
+              <FormHelperText>{errors.cover?.message}</FormHelperText>
             )}
-          </FormControl>
+          </Grid>
+          <Grid item xs={5} lg={3}>
+            <Button
+              sx={{
+                borderRadius: 20,
+                width: "100%",
+                height: 50,
+              }}
+              size="large"
+              variant="contained"
+              type="submit"
+            >
+              {book ? "Atualizar" : "Criar"}
+            </Button>
+          </Grid>
         </Grid>
-        <Grid item xs={12} lg={6}>
-          <TextField
-            type="number"
-            id="pages"
-            label="Nº de páginas"
-            sx={{
-              backgroundColor: "#dbb376",
-              borderRadius: 2,
-              minWidth: "100%",
-            }}
-            variant="filled"
-            helperText={errors.pages?.message || ""}
-            {...register("pages")}
-          />
-        </Grid>
-        <Grid item xs={12} lg={6}>
-          <TextField
-            id="publisher"
-            label="Editora"
-            sx={{
-              backgroundColor: "#dbb376",
-              borderRadius: 2,
-              minWidth: "100%",
-            }}
-            variant="filled"
-            helperText={errors.publisher?.message || ""}
-            {...register("publisher")}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            id="sinopsis"
-            label="Sinópse"
-            multiline
-            rows={4}
-            variant="filled"
-            sx={{
-              backgroundColor: "#dbb376",
-              borderRadius: 2,
-              minWidth: "100%",
-            }}
-            helperText={errors.sinopsis?.message || ""}
-            {...register("sinopsis")}
-          />
-        </Grid>
-        <Grid item xs={12} lg={6}>
-          <TextField
-            id="edition"
-            label="Edição"
-            sx={{
-              backgroundColor: "#dbb376",
-              borderRadius: 2,
-              minWidth: "100%",
-            }}
-            variant="filled"
-            helperText={errors.edition?.message || ""}
-            {...register("edition")}
-          />
-        </Grid>
-        <Grid item xs={12} lg={6}>
-          <TextField
-            type="date"
-            id="releaseDate"
-            label="Data de lançamento"
-            InputLabelProps={{ shrink: true }}
-            sx={{
-              backgroundColor: "#dbb376",
-              borderRadius: 2,
-              minWidth: "100%",
-            }}
-            variant="filled"
-            helperText={errors.releaseDate?.message || ""}
-            {...register("releaseDate")}
-          />
-        </Grid>
-        <Grid item xs={12} lg={6}>
-          <Button
-            className="FileButton"
-            component="label"
-            role={undefined}
-            size="large"
-            variant="contained"
-            tabIndex={-1}
-            startIcon={<CloudUploadIcon />}
-            sx={{
-              backgroundColor: "#dbb376",
-              borderRadius: 2,
-              minWidth: "100%",
-              minHeight: "100%",
-              color: "rgba(0, 0, 0, 0.6)",
-            }}
-          >
-            Capa do livro
-            <input hidden type="file" {...register("cover")} />
-          </Button>
-          {errors.cover?.message && (
-            <FormHelperText>{errors.cover?.message}</FormHelperText>
-          )}
-        </Grid>
-        <Grid item xs={5} lg={3}>
-          <Button
-            sx={{
-              borderRadius: 20,
-              width: "100%",
-              height: 50,
-            }}
-            size="large"
-            variant="contained"
-            type="submit"
-          >
-            {book ? "Atualizar" : "Criar"}
-          </Button>
-        </Grid>
-      </Grid>
-      <Snackbar message={"Ocorreu algum erro"} open={open} setOpen={setOpen} />
-      <BackDrop open={loading} />
-    </form>
+        <Snackbar
+          message={"Ocorreu algum erro"}
+          open={open}
+          setOpen={setOpen}
+        />
+        <BackDrop open={loading} />
+      </form>
+      <BookFormDialog open={openDialog} setOpen={setOpenDialog} />
+    </>
   );
 }

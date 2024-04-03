@@ -1,6 +1,6 @@
 import { FormGroup, Button } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { BackDrop, CustomTextField, Snackbar } from "../../../../Utils";
+import { BackDrop, CustomTextField } from "../../../../Utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import schema from "./schema";
 import "./CreateUserForm.css";
@@ -8,9 +8,8 @@ import { createUser, login } from "../../../../../service";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-export default function CreateUserForm() {
+export default function CreateUserForm({ setOpen }) {
   const [loading, setLoading] = useState();
-  const [open, setOpen] = useState(false);
 
   const {
     register,
@@ -95,12 +94,6 @@ export default function CreateUserForm() {
         </FormGroup>
         <BackDrop open={loading} />
       </form>
-      <Snackbar
-        message={"Esse nome de usuário já existe."}
-        open={open}
-        setOpen={setOpen}
-        hori="center"
-      />
     </>
   );
 }
