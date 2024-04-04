@@ -44,9 +44,9 @@ export default function BookCard(props) {
     }
   };
 
-  const addCheckout = async (bookId) => {
+  const addCheckout = async (book_id) => {
     try {
-      await createCheckoutOrder(bookId);
+      await createCheckoutOrder(book_id);
       setIsOrdered(true);
       setUser((prevUser) => {
         return { ...prevUser, checkout: ++prevUser.checkout };
@@ -56,18 +56,18 @@ export default function BookCard(props) {
     }
   };
 
-  const addFavorite = async (bookId) => {
+  const addFavorite = async (book_id) => {
     try {
-      await favorite(bookId);
+      await favorite(book_id);
       setIsFavorite(true);
     } catch (err) {
       return err;
     }
   };
 
-  const removeFavorite = async (bookId) => {
+  const removeFavorite = async (book_id) => {
     try {
-      await unfavorite(bookId);
+      await unfavorite(book_id);
       setIsFavorite(false);
     } catch (err) {
       return err;
@@ -75,10 +75,10 @@ export default function BookCard(props) {
   };
 
   useEffect(() => {
-    const fetchFavorite = async (bookId) => {
+    const fetchFavorite = async (book_id) => {
       try {
         setLoading(true);
-        const response = await getFavorite(bookId);
+        const response = await getFavorite(book_id);
         if (response.favorite) setIsFavorite(true);
       } catch (err) {
         return err;
@@ -91,8 +91,8 @@ export default function BookCard(props) {
   }, [book]);
 
   useEffect(() => {
-    const fetchCheckout = async (bookId) => {
-      const response = await getOneCheckout(bookId);
+    const fetchCheckout = async (book_id) => {
+      const response = await getOneCheckout(book_id);
       if (response?.rents) setIsOrdered(true);
     };
 
@@ -109,7 +109,7 @@ export default function BookCard(props) {
       >
         <CardHeader
           title={book?.title}
-          subheader={`${book?.author?.name || "Desconhecido"} ${book?.author?.surname || ""} - ${book?.category?.name || "Desconhecido"} - ${new Date(book?.releaseDate).toLocaleDateString()}`}
+          subheader={`${book?.author?.name || "Desconhecido"} ${book?.author?.surname || ""} - ${book?.category?.name || "Desconhecido"} - ${new Date(book?.release_date).toLocaleDateString()}`}
           sx={{
             "& div": {
               width: "100%",
@@ -189,7 +189,7 @@ export default function BookCard(props) {
             </Button>
           ) : (
             <>
-              {user?.id === book.userId && (
+              {user?.id === book.user_id && (
                 <Button>
                   <Link
                     style={{ color: "darkolivegreen" }}
@@ -199,7 +199,7 @@ export default function BookCard(props) {
                   </Link>
                 </Button>
               )}
-              {user?.id === book.userId && (
+              {user?.id === book.user_id && (
                 <Button
                   sx={{
                     color: "darkolivegreen",

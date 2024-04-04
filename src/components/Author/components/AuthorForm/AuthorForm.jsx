@@ -53,7 +53,7 @@ export default function AuthorForm({ author, method = "POST" }) {
   useEffect(() => {
     if (author) {
       for (const [key, value] of Object.entries(author)) {
-        if (key == "birthDate") {
+        if (key == "birth_date") {
           setValue(key, getDate());
         } else {
           setValue(key, value);
@@ -64,7 +64,7 @@ export default function AuthorForm({ author, method = "POST" }) {
 
   const getDate = () => {
     if (author) {
-      const date = new Date(author?.birthDate).toJSON().slice(0, 10);
+      const date = new Date(author?.birth_date).toJSON().slice(0, 10);
       return date;
     }
   };
@@ -133,7 +133,7 @@ export default function AuthorForm({ author, method = "POST" }) {
         <Grid item xs={12} lg={6}>
           <TextField
             type="date"
-            id="birthDate"
+            id="birth_date"
             label="Data de nascimento"
             InputLabelProps={{ shrink: true }}
             sx={{
@@ -142,8 +142,8 @@ export default function AuthorForm({ author, method = "POST" }) {
               minWidth: "100%",
             }}
             variant="filled"
-            helperText={errors.birthDate?.message || ""}
-            {...register("birthDate")}
+            helperText={errors.birth_date?.message || ""}
+            {...register("birth_date")}
           />
         </Grid>
         <Grid item xs={12} lg={6}>

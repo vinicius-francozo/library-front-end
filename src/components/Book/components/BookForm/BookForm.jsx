@@ -32,8 +32,8 @@ export default function BookForm({ book, method = "POST" }) {
   const [loading, setLoading] = useState(false);
   const [authorsArray, setAuthorsArray] = useState();
   const [categoriesArray, setCategoriesArray] = useState();
-  const [author, setAuthor] = useState(book?.authorId || "");
-  const [category, setCategory] = useState(book?.categoryId || "");
+  const [author, setAuthor] = useState(book?.author_id || "");
+  const [category, setCategory] = useState(book?.category_id || "");
 
   const navigate = useNavigate();
   const {
@@ -76,9 +76,9 @@ export default function BookForm({ book, method = "POST" }) {
   useEffect(() => {
     if (book) {
       for (const [key, value] of Object.entries(book)) {
-        if (key == "releaseDate") {
+        if (key == "release_date") {
           setValue(key, getDate());
-        } else if (key != "authorId" && key != "categoryId") {
+        } else if (key != "author_id" && key != "category_id") {
           setValue(key, value);
         } else {
           setValue(key, value);
@@ -111,7 +111,7 @@ export default function BookForm({ book, method = "POST" }) {
 
   const getDate = () => {
     if (book) {
-      const date = new Date(book?.releaseDate).toJSON().slice(0, 10);
+      const date = new Date(book?.release_date).toJSON().slice(0, 10);
       return date;
     }
   };
@@ -144,7 +144,7 @@ export default function BookForm({ book, method = "POST" }) {
                 value={author}
                 onChange={(e) => {
                   setAuthor(e.target.value);
-                  setValue("authorId", e.target.value);
+                  setValue("author_id", e.target.value);
                 }}
                 sx={{
                   backgroundColor: "#dbb376",
@@ -159,8 +159,8 @@ export default function BookForm({ book, method = "POST" }) {
                     </MenuItem>
                   ))}
               </Select>
-              {errors.authorId?.message && (
-                <FormHelperText>{errors.authorId?.message}</FormHelperText>
+              {errors.author_id?.message && (
+                <FormHelperText>{errors.author_id?.message}</FormHelperText>
               )}
             </FormControl>
           </Grid>
@@ -174,7 +174,7 @@ export default function BookForm({ book, method = "POST" }) {
                 value={category}
                 onChange={(e) => {
                   setCategory(e.target.value);
-                  setValue("categoryId", e.target.value);
+                  setValue("category_id", e.target.value);
                 }}
                 sx={{
                   backgroundColor: "#dbb376",
@@ -189,8 +189,8 @@ export default function BookForm({ book, method = "POST" }) {
                     </MenuItem>
                   ))}
               </Select>
-              {errors.categoryId?.message && (
-                <FormHelperText>{errors.categoryId?.message}</FormHelperText>
+              {errors.category_id?.message && (
+                <FormHelperText>{errors.category_id?.message}</FormHelperText>
               )}
             </FormControl>
             <IconButton
@@ -264,7 +264,7 @@ export default function BookForm({ book, method = "POST" }) {
           <Grid item xs={12} lg={6}>
             <TextField
               type="date"
-              id="releaseDate"
+              id="release_date"
               label="Data de lançamento"
               InputLabelProps={{ shrink: true }}
               sx={{
@@ -273,8 +273,8 @@ export default function BookForm({ book, method = "POST" }) {
                 minWidth: "100%",
               }}
               variant="filled"
-              helperText={errors.releaseDate?.message || ""}
-              {...register("releaseDate")}
+              helperText={errors.release_date?.message || ""}
+              {...register("release_date")}
             />
           </Grid>
           <Grid item xs={12} lg={6}>

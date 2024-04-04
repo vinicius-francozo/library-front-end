@@ -77,7 +77,7 @@ export default function AuthorForm(props) {
             </Button>
           ) : (
             <>
-              {user?.id === author.userId && (
+              {user?.id === author.user_id && (
                 <Button>
                   <Link
                     style={{ color: "darkolivegreen" }}
@@ -87,7 +87,7 @@ export default function AuthorForm(props) {
                   </Link>
                 </Button>
               )}
-              {user?.id === author.userId && (
+              {user?.id === author.user_id && (
                 <Button
                   sx={{
                     color: "darkolivegreen",

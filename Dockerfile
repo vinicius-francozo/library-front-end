@@ -2,7 +2,7 @@ FROM node:latest
 
 WORKDIR /usr/react
 
-COPY package*.json ./
+COPY package*.json /
 RUN npm install
 
 COPY . .
