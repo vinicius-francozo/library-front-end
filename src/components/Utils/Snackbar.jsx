@@ -33,7 +33,7 @@ export default function SimpleSnackbar({
   return (
     <div>
       <Snackbar
-        sx={{ "& div": { backgroundColor: "#b099b7", color: "black" } }}
+        sx={{ mt: 6, "& div": { backgroundColor: "#b099b7", color: "black" } }}
         open={open}
         anchorOrigin={{ vertical: vert, horizontal: hori }}
         autoHideDuration={4000}

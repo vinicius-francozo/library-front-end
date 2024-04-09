@@ -74,12 +74,16 @@ export default function BookCard(props) {
     }
   };
 
+  const handleRedirect = () => {
+    navigate("/login");
+  };
+
   useEffect(() => {
     const fetchFavorite = async (book_id) => {
       try {
         setLoading(true);
         const response = await getFavorite(book_id);
-        if (response.favorite) setIsFavorite(true);
+        if (response?.favorites) setIsFavorite(true);
       } catch (err) {
         return err;
       } finally {
@@ -157,7 +161,11 @@ export default function BookCard(props) {
           )}
         </CardContent>
         <CardActions disableSpacing>
-          {isFavorite ? (
+          {!user ? (
+            <IconButton aria-label="login to favorite" onClick={handleRedirect}>
+              <FavoriteBorderIcon />
+            </IconButton>
+          ) : isFavorite ? (
             <IconButton
               aria-label="remove from favorites"
               onClick={() => removeFavorite(book?.id)}
@@ -172,12 +180,18 @@ export default function BookCard(props) {
               <FavoriteBorderIcon />
             </IconButton>
           )}
-          <IconButton
-            onClick={() => addCheckout(book?.id)}
-            disabled={isOrdered}
-          >
-            <AddShoppingCartIcon />
-          </IconButton>
+          {!user ? (
+            <IconButton onClick={handleRedirect}>
+              <AddShoppingCartIcon />
+            </IconButton>
+          ) : (
+            <IconButton
+              onClick={() => addCheckout(book?.id)}
+              disabled={isOrdered}
+            >
+              <AddShoppingCartIcon />
+            </IconButton>
+          )}
           {props.seeMore ? (
             <Button>
               <Link

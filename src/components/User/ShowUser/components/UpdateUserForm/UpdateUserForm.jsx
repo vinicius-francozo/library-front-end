@@ -37,7 +37,7 @@ export default function UpdateUserForm() {
     try {
       setLoading(true);
       const response = await updateUser(data, user?.id);
-      setUserData(response.user);
+      setUserData(response?.users);
       setOpen(true);
     } catch (err) {
       return err;
@@ -89,7 +89,7 @@ export default function UpdateUserForm() {
     try {
       setLoading(true);
       const response = await changeImage(formData, user?.id);
-      setUserData(response.user);
+      setUserData(response?.users);
     } catch (err) {
       return err;
     } finally {

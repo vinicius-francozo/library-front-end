@@ -19,7 +19,7 @@ export default function ShowAuthor() {
       try {
         setLoading(true);
         const response = await getAuthor(authorId);
-        setAuthor(response?.author);
+        setAuthor(response?.authors);
       } catch (err) {
         return err;
       } finally {

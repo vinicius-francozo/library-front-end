@@ -110,7 +110,7 @@ export default function UserBooks() {
                   <CardMedia
                     component="img"
                     sx={{ width: 80 }}
-                    image={rent.Book.cover}
+                    image={rent.book.cover}
                     alt="Live from space album cover"
                   />
                   <Box
@@ -128,7 +128,7 @@ export default function UserBooks() {
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {rent.Book.title}
+                        {rent.book.title}
                       </Typography>
                       <Typography
                         variant="subtitle1"
@@ -138,7 +138,7 @@ export default function UserBooks() {
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {rent.Book.author.name}
+                        {rent.book.author?.name}
                       </Typography>
                       <Typography
                         textOverflow="ellipsis"

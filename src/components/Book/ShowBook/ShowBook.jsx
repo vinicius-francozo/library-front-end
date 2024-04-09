@@ -21,8 +21,8 @@ export default function ShowBook() {
       try {
         setLoading(true);
         const response = await getBook(bookId);
-        setBook(response?.book);
-        setComments(response?.book?.Reviews);
+        setBook(response?.books);
+        setComments(response?.books?.reviews);
       } catch (err) {
         return err;
       } finally {

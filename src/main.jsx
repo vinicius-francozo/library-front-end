@@ -42,7 +42,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/user/books/:userId",
+        path: "/user/books/",
         element: (
           <ProtectedRoute>
             <UserBooks />,
@@ -50,7 +50,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/user/favorite/:userId",
+        path: "/user/favorite/",
         element: (
           <ProtectedRoute>
             <UserFavorite />,
@@ -114,7 +114,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/checkout/:userId",
+        path: "/checkout/",
         element: (
           <ProtectedRoute>
             <Checkout />,

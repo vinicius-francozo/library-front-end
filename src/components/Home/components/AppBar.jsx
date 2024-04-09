@@ -133,7 +133,6 @@ export default function PrimarySearchAppBar() {
     setCart(cartNum);
     return cartNum;
   };
-
   useEffect(() => {
     fetchCartChip();
   }, [user]);
@@ -194,7 +193,7 @@ export default function PrimarySearchAppBar() {
     >
       <Link
         style={{ color: "black", textDecoration: "none" }}
-        to={user ? "/user/show/1" : "/login"}
+        to={user ? `/user/show/${user.id}` : "/login"}
       >
         <MenuItem onClick={handleMenuClose}>
           {user ? "Perfil" : "Login"}
@@ -212,13 +211,13 @@ export default function PrimarySearchAppBar() {
       )}
       <Link
         style={{ color: "black", textDecoration: "none" }}
-        to="/user/favorite/1"
+        to="/user/favorite/"
       >
         <MenuItem onClick={handleMenuClose}>Favoritos</MenuItem>
       </Link>
       <Link
         style={{ color: "black", textDecoration: "none" }}
-        to="/user/books/1"
+        to="/user/books/"
       >
         <MenuItem onClick={handleMenuClose}>Meus Livros</MenuItem>
       </Link>
@@ -244,7 +243,7 @@ export default function PrimarySearchAppBar() {
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
-        <Link to="checkout/1" style={{ color: "black" }}>
+        <Link to="/checkout" style={{ color: "black" }}>
           <IconButton
             size="large"
             aria-label="show 4 new mails"
@@ -312,7 +311,7 @@ export default function PrimarySearchAppBar() {
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <Link to="/checkout/1" style={{ color: "white" }}>
+            <Link to="/checkout" style={{ color: "white" }}>
               <IconButton
                 size="large"
                 aria-label="show 4 new mails"

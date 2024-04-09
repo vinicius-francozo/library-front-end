@@ -72,6 +72,8 @@ export default function Checkout() {
     }
   };
 
+  console.log(cart);
+
   useEffect(() => {
     fetchCheckout();
   }, []);
@@ -134,7 +136,7 @@ export default function Checkout() {
             cart?.map((book) => (
               <Grid
                 item
-                key={book?.Book.id}
+                key={book?.book.id}
                 xs={12}
                 sx={{
                   backgroundColor: "whitesmoke",
@@ -148,7 +150,7 @@ export default function Checkout() {
                   <CardMedia
                     component="img"
                     sx={{ width: 80 }}
-                    image={book?.Book.cover}
+                    image={book?.book.cover}
                     alt="Live from space album cover"
                   />
                   <Box
@@ -166,7 +168,7 @@ export default function Checkout() {
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {book?.Book.title}
+                        {book?.book.title}
                       </Typography>
                       <Typography
                         variant="subtitle1"
@@ -176,14 +178,14 @@ export default function Checkout() {
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {book?.Book.author.name}
+                        {book?.book.author?.name}
                       </Typography>
                       <Typography
                         textOverflow="ellipsis"
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {book?.Book.sinopsis}
+                        {book?.book.sinopsis}
                       </Typography>
                       <Box
                         sx={{

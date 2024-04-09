@@ -110,7 +110,7 @@ export default function UserFavorites() {
                   <CardMedia
                     component="img"
                     sx={{ width: 80 }}
-                    image={book?.Book.cover}
+                    image={book?.book.cover}
                     alt="Live from space album cover"
                   />
                   <Box
@@ -128,7 +128,7 @@ export default function UserFavorites() {
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {book?.Book.title}
+                        {book?.book.title}
                       </Typography>
                       <Typography
                         variant="subtitle1"
@@ -138,7 +138,7 @@ export default function UserFavorites() {
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {book?.Book.author?.name}
+                        {book?.book.author?.name}
                       </Typography>
                       <Box
                         sx={{
@@ -148,7 +148,7 @@ export default function UserFavorites() {
                         }}
                       >
                         <Button
-                          onClick={() => removeFavorite(book.Book.id)}
+                          onClick={() => removeFavorite(book.book.id)}
                           color="success"
                         >
                           Desfavoritar
@@ -164,7 +164,7 @@ export default function UserFavorites() {
                     }}
                   >
                     <Button
-                      onClick={() => removeFavorite(book.Book.id)}
+                      onClick={() => removeFavorite(book.book.id)}
                       color="success"
                     >
                       Desfavoritar
