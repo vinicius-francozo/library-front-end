@@ -36,7 +36,7 @@ export default function AuthorForm(props) {
       >
         <CardHeader
           title={`${author?.name} ${author?.surname}`}
-          subheader={`${new Date(author?.birthDate).toLocaleDateString()} - ${author?.country}`}
+          subheader={`${new Date(author?.birth_date).toLocaleDateString()} - ${author?.country}`}
           sx={{
             "& div": {
               width: "100%",
