@@ -35,8 +35,12 @@ export default function AuthorForm({ author, method = "POST" }) {
     try {
       setLoading(true);
       if (method === "POST") {
-        await createAuthor(formData);
-        navigate("/author", { state: { openSnackbar: true } });
+        const response = await createAuthor(formData);
+        if (response?.request?.status === 422) {
+          setOpen(true);
+        } else {
+          navigate("/author", { state: { openSnackbar: true } });
+        }
       } else {
         await updateAuthor(author.id, formData);
         navigate(`/author/show/${author.id}`, {

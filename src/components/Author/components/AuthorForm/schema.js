@@ -6,7 +6,8 @@ const schema = yup.object().shape({
   description: yup.string().required("A descrição não pode ficar em branco"),
   country: yup.string().required("O país não pode ficar em branco"),
   birth_date: yup
-    .string()
+    .date()
+    .max(new Date(), "Insira uma data válida")
     .required("A data de nascimento não pode ficar em branco"),
   picture: yup
     .mixed()

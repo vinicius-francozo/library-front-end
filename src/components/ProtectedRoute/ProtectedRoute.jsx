@@ -12,7 +12,7 @@ export default function ProtectedRoute({ children, isProtected = false }) {
     if (user === 0) {
       navigate("/login", { replace: true });
       return null;
-    } else if (isProtected && !user?.isAdmin) {
+    } else if (user !== null && isProtected && !user?.isAdmin) {
       navigate("/", { replace: true });
       return null;
     }

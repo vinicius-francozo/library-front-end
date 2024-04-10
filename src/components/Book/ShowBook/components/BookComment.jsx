@@ -22,6 +22,8 @@ export default function BookComment({ comment }) {
     }
   };
 
+  console.log(comment, user);
+
   return (
     <Grid
       container
@@ -49,7 +51,7 @@ export default function BookComment({ comment }) {
           value={comment?.rate}
         />
       </Grid>
-      {user?.id === comment?.user?.id && (
+      {(user?.id === comment?.user_id || user?.isAdmin) && (
         <Grid item xs={12}>
           <Button
             color="error"
