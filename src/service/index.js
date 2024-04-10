@@ -32,6 +32,11 @@ export {
   getOneCheckout,
 } from "./rents";
 
-export { createReview, deleteReview, getUserReviews } from "./reviews";
+export {
+  createReview,
+  deleteReview,
+  getUserReviews,
+  updateReview,
+} from "./reviews";
 
 export { changeImage, createUser, getUser, updateUser } from "./users";

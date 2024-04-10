@@ -18,6 +18,15 @@ const createReview = async (data, bookId) => {
   }
 };
 
+const updateReview = async (data, reviewId) => {
+  try {
+    const response = await baseURL.put(`/reviews/${reviewId}`, { ...data });
+    return response.data;
+  } catch (err) {
+    return err;
+  }
+};
+
 const deleteReview = async (reviewId) => {
   try {
     const response = await baseURL.delete(`/reviews/${reviewId}`);
@@ -27,4 +36,4 @@ const deleteReview = async (reviewId) => {
   }
 };
 
-export { createReview, deleteReview, getUserReviews };
+export { createReview, deleteReview, getUserReviews, updateReview };

@@ -123,8 +123,7 @@ export default function PrimarySearchAppBar() {
       setUser(userInfo);
       return;
     }
-    console.log(jwtToken);
-    // setUser(0);
+    setUser(0);
   }, []);
 
   const fetchCartChip = async () => {

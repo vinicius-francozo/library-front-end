@@ -6,8 +6,6 @@ export default function ProtectedRoute({ children, isProtected = false }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  console.log(user);
-
   useEffect(() => {
     if (user === 0) {
       navigate("/login", { replace: true });
