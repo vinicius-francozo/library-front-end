@@ -103,7 +103,6 @@ export default function BookCard(props) {
     fetchCheckout(book?.id);
   }, []);
 
-  console.log(book);
   return (
     <Grid item xs={12} lg={props.lg || 3}>
       <Card

@@ -72,8 +72,6 @@ export default function Checkout() {
     }
   };
 
-  console.log(cart);
-
   useEffect(() => {
     fetchCheckout();
   }, []);
