@@ -29,7 +29,7 @@ const changeImage = async (image, userId) => {
 
 const createUser = async (data) => {
   try {
-    const response = await baseURL.post(`/users/create`, data);
+    const response = await baseURL.post(`/users`, data);
     return response.data;
   } catch (err) {
     return err;

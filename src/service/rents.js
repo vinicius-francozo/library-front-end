@@ -2,6 +2,8 @@ import baseURL from "./config";
 
 const getCheckout = async () => {
   try {
+    console.log(baseURL.url())
+
     const response = await baseURL.get("/rents/checkout");
     return response.data;
   } catch (err) {

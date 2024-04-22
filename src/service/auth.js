@@ -10,7 +10,7 @@ const login = async (username, password) => {
       },
       {}
     );
-    const authToken = response.headers["x-access-token"];
+    const authToken = response.data
     return authToken;
   } catch (err) {
     return err;

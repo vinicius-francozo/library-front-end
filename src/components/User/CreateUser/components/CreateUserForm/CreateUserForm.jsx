@@ -27,6 +27,7 @@ export default function CreateUserForm({ setOpen }) {
         throw new Error();
       }
       const response = await login(data.username, data.password);
+      console.log(response)
       localStorage.setItem("token", response);
       navigate("/", { state: { openSnackbar: true } });
       navigate(0);
