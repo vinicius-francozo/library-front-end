@@ -22,8 +22,9 @@ import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context";
-import { getBooksByName, getCheckout } from "../../../service";
+import { GET_BOOKS_BY_NAME, GET_CHECKOUT } from "../../../service";
 import { Snackbar } from "../../Utils";
+import { useLazyQuery, useQuery } from "@apollo/client";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -73,6 +74,9 @@ export default function PrimarySearchAppBar() {
   const [cart, setCart] = useState(localStorage.getItem("cartChip") || 0);
 
   const { user, setUser } = useAuth();
+
+  const getCheckout = useQuery(GET_CHECKOUT);
+  const [getBookByName, getBookByNameResult] = useLazyQuery(GET_BOOKS_BY_NAME);
   const navigate = useNavigate();
 
   const logout = () => {
@@ -106,9 +110,13 @@ export default function PrimarySearchAppBar() {
 
   const handleKeyDown = async (event) => {
     if (event.key === "Enter") {
-      const response = await getBooksByName(event.target.value);
-      if (response?.books?.length) {
-        navigate("/book", { state: { foundBooks: response?.books } });
+      await getBookByName({
+        variables: { name: event.target.value },
+      });
+      if (getBookByNameResult.data?.bookByName.length) {
+        navigate("/book", {
+          state: { foundBooks: getBookByNameResult.data?.bookByName?.books },
+        });
         navigate(0);
       } else {
         setOpenSnack(true);
@@ -127,15 +135,19 @@ export default function PrimarySearchAppBar() {
   }, []);
 
   const fetchCartChip = async () => {
-    const response = await getCheckout();
-    const cartNum = response?.rents?.length;
+    if (!getCheckout.data) {
+      getCheckout.refetch();
+      return;
+    }
+    const cartNum = getCheckout.data.listCheckout.length;
     localStorage.setItem("cartChip", cartNum);
     setCart(cartNum);
     return cartNum;
   };
+
   useEffect(() => {
     fetchCartChip();
-  }, [user]);
+  }, [user, getCheckout.data]);
 
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>

@@ -1,20 +1,9 @@
-import axios from "axios";
+import { gql } from "@apollo/client";
 
-const login = async (username, password) => {
-  try {
-    const response = await axios.post(
-      import.meta.env.VITE_REACT_APP_AUTH_ROUTE,
-      {
-        username: username,
-        password: password,
-      },
-      {}
-    );
-    const authToken = response.data
-    return authToken;
-  } catch (err) {
-    return err;
+const LOGIN_REQUEST = gql`
+  mutation Login($username: String!, $password: String!) {
+    login(data: { username: $username, password: $password })
   }
-};
+`;
 
-export { login };
+export { LOGIN_REQUEST };

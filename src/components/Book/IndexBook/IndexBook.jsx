@@ -5,11 +5,11 @@ import { useLocation } from "react-router-dom";
 import { BookCard } from "../components";
 import { BackDrop, Snackbar, Pagination } from "../../Utils";
 import { useEffect, useState } from "react";
-import { getBooks, getPaginatedBooks } from "../../../service";
+import { GET_BOOKS, GET_BOOKS_PAGINATED } from "../../../service";
+import { useQuery } from "@apollo/client";
 
 export default function IndexBook() {
   const location = useLocation();
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(
     location?.state?.openSnackbar ? true : false
   );
@@ -18,6 +18,11 @@ export default function IndexBook() {
   const [totalBooks, setTotalBooks] = useState();
   const foundBooks = location?.state?.foundBooks;
   const [books, setBooks] = useState(foundBooks);
+
+  const getBooks = useQuery(GET_BOOKS);
+  const getBooksPaginated = useQuery(GET_BOOKS_PAGINATED, {
+    variables: { perPage: `${rowsPerPage}`, page: `${page + 1}` },
+  });
 
   const booksCarousel = [
     {
@@ -30,33 +35,27 @@ export default function IndexBook() {
 
   useEffect(() => {
     const fetchBooks = async () => {
-      try {
-        setLoading(true);
-        const response = await getBooks();
-        setTotalBooks(response?.books?.length);
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
-      }
+      setTotalBooks(getBooks.data?.findAllBooks?.length);
     };
-    if (!foundBooks) fetchBooks();
-  }, [foundBooks]);
+
+    const fetchBooksPaginated = async () => {
+      if (rowsPerPage && page && !getBooksPaginated.data) {
+        getBooksPaginated.refetch();
+        return;
+      }
+      setBooks(getBooksPaginated.data?.bookPerPage);
+    };
+    if (!foundBooks) {
+      fetchBooks();
+      fetchBooksPaginated();
+    }
+  }, [foundBooks, getBooks.data, getBooksPaginated.data]);
 
   useEffect(() => {
-    const fetchAuthor = async () => {
-      try {
-        setLoading(true);
-        const response = await getPaginatedBooks(rowsPerPage, page);
-        setBooks(response?.books);
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (!foundBooks) fetchAuthor();
-  }, [page, rowsPerPage, setPage, setRowsPerPage, foundBooks]);
+    getBooksPaginated.fetchMore({
+      variables: { perPage: `${rowsPerPage}`, page: `${page + 1}` },
+    });
+  }, [page, rowsPerPage, setPage, setRowsPerPage]);
 
   const Img = styled("img")({
     display: "block",
@@ -94,7 +93,7 @@ export default function IndexBook() {
         open={open}
         setOpen={setOpen}
       />
-      <BackDrop open={loading} />
+      <BackDrop open={getBooks.loading || getBooksPaginated.loading} />
     </Box>
   );
 }

@@ -1,80 +1,167 @@
-import baseURL from "./config";
+import { gql } from "@apollo/client";
 
-const getBooks = async () => {
-  try {
-    const response = await baseURL.get("/books");
-    return response.data;
-  } catch (err) {
-    return err;
+const GET_BOOKS = gql`
+  query {
+    findAllBooks {
+      id
+    }
   }
-};
+`;
 
-const getPaginatedBooks = async (perPage, page) => {
-  try {
-    const response = await baseURL.get(
-      `/books/perPage?perPage=${perPage}&page=${page}`
-    );
-    return response.data;
-  } catch (err) {
-    return err;
+const GET_BOOKS_PAGINATED = gql`
+  query GetBooksPaginated($perPage: String!, $page: String!) {
+    bookPerPage(perPage: $perPage, page: $page) {
+      id
+      title
+      release_date
+      cover
+      sinopsis
+      pages
+      publisher
+      edition
+      author {
+        name
+        surname
+      }
+      category {
+        name
+      }
+    }
   }
-};
+`;
 
-const getBooksByName = async (query) => {
-  try {
-    const response = await baseURL.get(`/books/find/${query}`);
-    return response.data;
-  } catch (err) {
-    return err;
+const GET_BOOKS_BY_NAME = gql`
+  query BooksByName($name: String!) {
+    bookByName(name: $name) {
+      id
+      title
+      release_date
+      cover
+      sinopsis
+      pages
+      publisher
+      edition
+      author {
+        name
+        surname
+      }
+      category {
+        name
+      }
+    }
   }
-};
+`;
 
-const createBook = async (data) => {
-  try {
-    const response = await baseURL.post("/books", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return response;
-  } catch (err) {
-    return err;
+const GET_BOOK_BY_ID = gql`
+  query GetBook($id: String!) {
+    findOneBook(id: $id) {
+      id
+      title
+      release_date
+      cover
+      sinopsis
+      pages
+      publisher
+      edition
+      user {
+        id
+      }
+      author {
+        id
+        name
+        surname
+      }
+      category {
+        id
+        name
+      }
+      reviews {
+        id
+        rate
+        text
+        user {
+          id
+          username
+        }
+      }
+    }
   }
-};
+`;
 
-const getBook = async (id) => {
-  try {
-    const response = await baseURL.get(`/books/${id}`);
-    return response.data;
-  } catch (err) {
-    return err;
+const CREATE_BOOK = gql`
+  mutation CreateBook(
+    $title: String!
+    $publisher: String!
+    $sinopsis: String!
+    $edition: String!
+    $cover: Upload!
+    $pages: Float!
+    $release_date: String!
+    $author_id: Float!
+    $category_id: Float!
+  ) {
+    createBook(
+      data: {
+        title: $title
+        publisher: $publisher
+        sinopsis: $sinopsis
+        edition: $edition
+        cover: $cover
+        pages: $pages
+        release_date: $release_date
+        author_id: $author_id
+        category_id: $category_id
+      }
+    ) {
+      id
+    }
   }
-};
+`;
 
-const updateBook = async (id, data) => {
-  try {
-    const response = await baseURL.put(`/books/${id}`, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return response.data;
-  } catch (err) {
-    return err;
+const UPDATE_BOOK = gql`
+  mutation UpdateBook(
+    $id: String!
+    $title: String
+    $publisher: String
+    $sinopsis: String
+    $edition: String
+    $cover: Upload
+    $pages: Float
+    $release_date: String
+    $author_id: Float
+    $category_id: Float
+  ) {
+    updateBook(
+      id: $id
+      data: {
+        title: $title
+        publisher: $publisher
+        sinopsis: $sinopsis
+        edition: $edition
+        cover: $cover
+        pages: $pages
+        release_date: $release_date
+        author_id: $author_id
+        category_id: $category_id
+      }
+    ) {
+      title
+    }
   }
-};
+`;
 
-const deleteBook = async (id) => {
-  try {
-    const response = await baseURL.delete(`/books/${id}`);
-    return response;
-  } catch (err) {
-    return err;
+const DELETE_BOOK = gql`
+  mutation DeleteBook($id: String!) {
+    deleteBook(id: $id)
   }
-};
+`;
 
 export {
-  getBooks,
-  createBook,
-  getBook,
-  updateBook,
-  deleteBook,
-  getPaginatedBooks,
-  getBooksByName,
+  GET_BOOKS,
+  CREATE_BOOK,
+  GET_BOOK_BY_ID,
+  UPDATE_BOOK,
+  DELETE_BOOK,
+  GET_BOOKS_PAGINATED,
+  GET_BOOKS_BY_NAME,
 };

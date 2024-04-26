@@ -16,15 +16,19 @@ import schema from "./schema";
 import "./BookForm.css";
 import { useEffect, useState } from "react";
 import {
-  createBook,
-  getAuthors,
-  getCategories,
-  updateBook,
+  CREATE_BOOK,
+  GET_AUTHORS,
+  GET_BOOKS,
+  GET_BOOKS_PAGINATED,
+  GET_BOOK_BY_ID,
+  GET_CATEGORIES,
+  UPDATE_BOOK,
 } from "../../../../service";
 import { BackDrop, Snackbar } from "../../../Utils";
 import { useNavigate } from "react-router-dom";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { BookFormDialog } from ".";
+import { useMutation, useQuery } from "@apollo/client";
 
 export default function BookForm({ book, method = "POST" }) {
   const [open, setOpen] = useState(false);
@@ -32,8 +36,17 @@ export default function BookForm({ book, method = "POST" }) {
   const [loading, setLoading] = useState(false);
   const [authorsArray, setAuthorsArray] = useState();
   const [categoriesArray, setCategoriesArray] = useState();
-  const [author, setAuthor] = useState(book?.author_id || "");
-  const [category, setCategory] = useState(book?.category_id || "");
+  const [author, setAuthor] = useState(book?.author?.id || "");
+  const [category, setCategory] = useState(book?.category?.id || "");
+
+  const getCategory = useQuery(GET_CATEGORIES);
+  const getAuthors = useQuery(GET_AUTHORS);
+  const [createBookFn, createBook] = useMutation(CREATE_BOOK, {
+    refetchQueries: [GET_BOOKS_PAGINATED, GET_BOOKS],
+  });
+  const [updateBookFn, updateBook] = useMutation(UPDATE_BOOK, {
+    refetchQueries: [GET_BOOK_BY_ID],
+  });
 
   const navigate = useNavigate();
   const {
@@ -43,25 +56,27 @@ export default function BookForm({ book, method = "POST" }) {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  const onSubmit = async (data) => {
-    const formData = new FormData();
-    for (const item of Object.entries(data)) {
-      if (item[0] !== "cover") {
-        formData.append(item[0], item[1]);
-      }
+  const onSubmit = async (bookData) => {
+    if (typeof bookData.cover !== "string") {
+      bookData.cover = bookData.cover[0];
+    } else {
+      delete bookData.cover;
+      delete bookData.reviews;
     }
-    formData.append(
-      "image",
-      typeof data.cover === "string" ? data.cover : data.cover[0]
-    );
-
     try {
       setLoading(true);
       if (method === "POST") {
-        await createBook(formData);
+        await createBookFn({ variables: { ...bookData } });
+        if (createBook.error) throw new Error();
         navigate("/book", { state: { openSnackbar: true } });
       } else {
-        await updateBook(book.id, formData);
+        await updateBookFn({
+          variables: {
+            id: book.id,
+            ...bookData,
+          },
+        });
+        if (updateBook.error) throw new Error();
         navigate(`/book/show/${book.id}`, {
           state: { openSnackbar: true },
         });
@@ -78,10 +93,10 @@ export default function BookForm({ book, method = "POST" }) {
       for (const [key, value] of Object.entries(book)) {
         if (key == "release_date") {
           setValue(key, getDate());
-        } else if (key != "author_id" && key != "category_id") {
+        } else if (key != "author" && key != "category") {
           setValue(key, value);
         } else {
-          setValue(key, value);
+          setValue(`${key}_id`, value.id);
         }
       }
     }
@@ -89,25 +104,16 @@ export default function BookForm({ book, method = "POST" }) {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await getCategories();
-      setCategoriesArray(response.categories);
+      setCategoriesArray(getCategory.data?.findAllCategories);
     };
 
     const fetchAuthors = async () => {
-      const response = await getAuthors();
-      setAuthorsArray(response.authors);
+      setAuthorsArray(getAuthors.data?.findAllAuthors);
     };
 
-    try {
-      setLoading(true);
-      fetchCategories();
-      fetchAuthors();
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    fetchCategories();
+    fetchAuthors();
+  }, [getCategory.data, getAuthors.data]);
 
   const getDate = () => {
     if (book) {

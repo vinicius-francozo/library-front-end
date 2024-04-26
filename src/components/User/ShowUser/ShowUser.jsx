@@ -4,48 +4,34 @@ import "./ShowUser.css";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useAuth } from "../../../context";
 import { useEffect, useState } from "react";
-import { getUser, getUserReviews } from "../../../service";
+import { GET_USER, GET_USER_REVIEWS } from "../../../service";
 import { BackDrop } from "../../Utils";
+import { useQuery } from "@apollo/client";
 
 export default function ShowUser() {
   const matches = useMediaQuery("(max-width:600px)");
   const [userData, setUserData] = useState();
-  const [loading, setLoading] = useState(false);
-  const [reviews, setReviews] = useState();
 
   const { user } = useAuth();
+  const getUser = useQuery(GET_USER, {
+    variables: { id: `${user?.id}` },
+  });
+
+  const getUserReviews = useQuery(GET_USER_REVIEWS);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setLoading(true);
-        if (user?.id) {
-          const response = await getUser(user?.id);
-          setUserData(response);
-        }
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (user && !getUser.data) {
+      getUser.refetch();
+    }
 
-    const fetchUserReviews = async () => {
-      try {
-        setLoading(true);
-        if (user?.id) {
-          const response = await getUserReviews(user?.id);
-          setReviews(response?.reviews?.length);
-        }
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUserReviews();
-    fetchUser();
-  }, [user]);
+    if (user && !getUserReviews.data) {
+      getUserReviews.refetch();
+    }
+
+    if (getUser.data) {
+      setUserData(getUser.data.findOneUser);
+    }
+  }, [user, getUser.data, getUserReviews.data]);
 
   return (
     <Container
@@ -81,19 +67,8 @@ export default function ShowUser() {
           gridTemplateColumns={matches ? "1fr" : "repeat(5, 1fr)"}
           rowGap={matches ? 4 : 0}
         >
-          {userData && reviews !== undefined && (
+          {userData && getUserReviews?.data && (
             <>
-              <Typography
-                variant="h6"
-                textTransform="uppercase"
-                fontFamily="roboto"
-                fontWeight="300"
-                color="rgba(245, 255, 193, 0.89)"
-                gridColumn={matches ? "span 3" : "span 1"}
-              >
-                Conta criada em:{" "}
-                {new Date(userData?.createdAt).toLocaleDateString()}
-              </Typography>
               <Typography
                 variant="h6"
                 textTransform="uppercase"
@@ -142,13 +117,13 @@ export default function ShowUser() {
                 color="rgba(245, 255, 193, 0.89)"
                 gridColumn={matches ? "span 2" : "5/6"}
               >
-                # Comentários: {reviews}
+                # Comentários: {getUserReviews.data.getUserReviews.length}
               </Typography>
             </>
           )}
         </Box>
       </Paper>
-      <BackDrop open={loading} />
+      <BackDrop open={getUser.loading || getUserReviews.loading} />
     </Container>
   );
 }

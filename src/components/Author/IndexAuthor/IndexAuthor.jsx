@@ -5,11 +5,11 @@ import { useLocation } from "react-router-dom";
 import { AuthorCard } from "../components";
 import { BackDrop, Pagination, Snackbar } from "../../Utils";
 import { useEffect, useState } from "react";
-import { getAuthors, getPaginatedAuthors } from "../../../service";
+import { GET_AUTHORS, GET_AUTHORS_PAGINATED } from "../../../service";
+import { useQuery } from "@apollo/client";
 
 export default function IndexAuthor() {
   const location = useLocation();
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(
     location?.state?.openSnackbar ? true : false
   );
@@ -17,6 +17,11 @@ export default function IndexAuthor() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(4);
   const [totalAuthors, setTotalAuthors] = useState();
+
+  const getAuthors = useQuery(GET_AUTHORS);
+  const getAuthorsPaginated = useQuery(GET_AUTHORS_PAGINATED, {
+    variables: { perPage: `${rowsPerPage}`, page: `${page + 1}` },
+  });
 
   const booksCarousel = [
     {
@@ -28,33 +33,23 @@ export default function IndexAuthor() {
   ];
 
   useEffect(() => {
+    if (getAuthors.data) {
+      setTotalAuthors(getAuthors.data.findAllAuthors.length);
+    }
     const fetchAuthor = async () => {
-      try {
-        setLoading(true);
-        const response = await getAuthors();
-        setTotalAuthors(response?.authors?.length);
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
+      if (rowsPerPage && page && !getAuthorsPaginated.data) {
+        getAuthorsPaginated.refetch();
+        return;
       }
+      setAuthors(getAuthorsPaginated.data?.authorPerPage);
     };
     fetchAuthor();
-  }, []);
+  }, [getAuthors.data, getAuthorsPaginated.data]);
 
   useEffect(() => {
-    const fetchAuthor = async () => {
-      try {
-        setLoading(true);
-        const response = await getPaginatedAuthors(rowsPerPage, page);
-        setAuthors(response?.authors);
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAuthor();
+    getAuthorsPaginated.fetchMore({
+      variables: { perPage: `${rowsPerPage}`, page: `${page + 1}` },
+    });
   }, [page, rowsPerPage, setPage, setRowsPerPage]);
 
   const Img = styled("img")({
@@ -85,7 +80,7 @@ export default function IndexAuthor() {
           setPage={setPage}
           rowsPerPage={rowsPerPage}
           setRowsPerPage={setRowsPerPage}
-          count={totalAuthors}
+          count={totalAuthors || 0}
         />
       </Grid>
       <Snackbar
@@ -93,7 +88,7 @@ export default function IndexAuthor() {
         open={open}
         setOpen={setOpen}
       />
-      <BackDrop open={loading} />
+      <BackDrop open={getAuthors.loading || getAuthorsPaginated.loading} />
     </Box>
   );
 }

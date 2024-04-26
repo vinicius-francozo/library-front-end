@@ -5,8 +5,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import schema from "./schema";
 import "./LoginForm.css";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../../../../service";
-import { useState } from "react";
+// import { login } from "../../../../../service";
+import { useEffect, useState } from "react";
+import { useMutation } from "@apollo/client";
+import { LOGIN_REQUEST } from "../../../../../service";
 
 export default function LoginForm() {
   const {
@@ -14,28 +16,24 @@ export default function LoginForm() {
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
-
+  const [login, { loading, error, data }] = useMutation(LOGIN_REQUEST);
   const [open, setOpen] = useState(false);
-
   const navigate = useNavigate();
 
-  const onSubmit = async (data) => {
-    try {
-      setOpen(false);
-      const response = await login(data.username, data.password);
-      if (
-        response?.response?.status == 401 ||
-        response?.response?.status == 500
-      ) {
-        throw new Error();
-      }
-      localStorage.setItem("token", response);
+  const onSubmit = async (userData) => {
+    login({
+      variables: { username: userData.username, password: userData.password },
+    });
+  };
+
+  useEffect(() => {
+    if (error) setOpen(true);
+    if (!loading && data) {
+      localStorage.setItem("token", data.login);
       navigate("/", { replace: true });
       navigate(0);
-    } catch (err) {
-      setOpen(true);
     }
-  };
+  }, [error, loading, data]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

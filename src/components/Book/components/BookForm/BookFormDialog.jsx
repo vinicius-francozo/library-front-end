@@ -6,11 +6,14 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { createCategory } from "../../../../service";
+import { CREATE_CATEGORY } from "../../../../service";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@apollo/client";
 
 export default function FormDialog({ open, setOpen }) {
   const navigate = useNavigate();
+
+  const [createCategory] = useMutation(CREATE_CATEGORY);
 
   const handleClose = () => {
     setOpen(false);
@@ -26,7 +29,9 @@ export default function FormDialog({ open, setOpen }) {
           onSubmit: async (event) => {
             event.preventDefault();
 
-            await createCategory(event.target[0].value);
+            await createCategory({
+              variables: { name: event.target[0].value },
+            });
             handleClose();
             navigate(0);
           },

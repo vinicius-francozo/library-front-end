@@ -12,41 +12,30 @@ import {
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState, useEffect } from "react";
-import { getRentals, returnBook } from "../../../service";
+import { GET_RENTALS, RETURN_BOOK } from "../../../service";
 import { BackDrop } from "../../Utils";
+import { useMutation, useQuery } from "@apollo/client";
 
 export default function UserBooks() {
   const matches = useMediaQuery("(max-width:600px)");
-  const [loading, setLoading] = useState(false);
   const [rents, setRents] = useState();
 
+  const listRentals = useQuery(GET_RENTALS);
+  const [returnBook, { loading }] = useMutation(RETURN_BOOK);
+
   const returnRental = async (id) => {
-    try {
-      setLoading(true);
-      await returnBook(id);
-      fetchRentals();
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
-    }
+    await returnBook({ variables: { rentId: id } });
+    fetchRentals();
   };
 
   const fetchRentals = async () => {
-    try {
-      setLoading(true);
-      const response = await getRentals();
-      setRents(response.rents);
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
-    }
+    await listRentals.refetch();
+    setRents(listRentals?.data?.listRents);
   };
 
   useEffect(() => {
     fetchRentals();
-  }, []);
+  }, [listRentals.data]);
 
   return (
     <Container
@@ -183,7 +172,7 @@ export default function UserBooks() {
           )}
         </Grid>
       </Paper>
-      <BackDrop open={loading} />
+      <BackDrop open={loading || listRentals.loading} />
     </Container>
   );
 }

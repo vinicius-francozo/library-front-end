@@ -10,14 +10,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import schema from "./schema";
-import { createReview } from "../../../../../service";
+import { CREATE_REVIEW } from "../../../../../service";
 import { useNavigate } from "react-router-dom";
 import { BackDrop } from "../../../../Utils";
 import { useAuth } from "../../../../../context";
+import { useMutation } from "@apollo/client";
 
 export default function CreateBookComment({ bookId }) {
   const [rating, setRating] = useState();
-  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -28,16 +28,12 @@ export default function CreateBookComment({ bookId }) {
 
   const navigate = useNavigate();
 
+  const [createReview, { loading }] = useMutation(CREATE_REVIEW);
+
   const onSubmit = async (data) => {
-    try {
-      setLoading(true);
-      await createReview(data, bookId);
-      navigate(0);
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
-    }
+    await createReview({ variables: { bookId, ...data } });
+
+    navigate(0);
   };
 
   return (

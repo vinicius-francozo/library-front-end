@@ -12,41 +12,31 @@ import {
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useEffect, useState } from "react";
-import { getFavorites, unfavorite } from "../../../service";
+import { GET_FAVORITES, REMOVE_FAVORITE } from "../../../service";
 import { BackDrop } from "../../Utils";
+import { useMutation, useQuery } from "@apollo/client";
 
 export default function UserFavorites() {
   const matches = useMediaQuery("(max-width:600px)");
-  const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState();
 
-  const removeFavorite = async (bookId) => {
-    try {
-      setLoading(true);
-      await unfavorite(bookId);
-      fetchFavorites();
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
-    }
+  const getFavorites = useQuery(GET_FAVORITES);
+  const [removeFavoritefn, removeFavorite] = useMutation(REMOVE_FAVORITE, {
+    refetchQueries: [GET_FAVORITES],
+  });
+
+  const deleteFavorite = async (bookId) => {
+    await removeFavoritefn({ variables: { bookId: bookId } });
+    fetchFavorites();
   };
 
   const fetchFavorites = async () => {
-    try {
-      setLoading(true);
-      const response = await getFavorites();
-      setFavorites(response.favorites);
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
-    }
+    setFavorites(getFavorites?.data.getUserFavorites);
   };
 
   useEffect(() => {
     fetchFavorites();
-  }, []);
+  }, [getFavorites?.data]);
 
   return (
     <Container
@@ -93,10 +83,10 @@ export default function UserFavorites() {
               Não há livros no momento!
             </Typography>
           ) : (
-            favorites?.map((book) => (
+            favorites?.map((favorite) => (
               <Grid
                 item
-                key={book?.id}
+                key={favorite?.id}
                 xs={12}
                 sx={{
                   backgroundColor: "whitesmoke",
@@ -110,7 +100,7 @@ export default function UserFavorites() {
                   <CardMedia
                     component="img"
                     sx={{ width: 80 }}
-                    image={book?.book.cover}
+                    image={favorite?.book.cover}
                     alt="Live from space album cover"
                   />
                   <Box
@@ -128,7 +118,7 @@ export default function UserFavorites() {
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {book?.book.title}
+                        {favorite?.book.title}
                       </Typography>
                       <Typography
                         variant="subtitle1"
@@ -138,7 +128,7 @@ export default function UserFavorites() {
                         whiteSpace="nowrap"
                         overflow="hidden"
                       >
-                        {book?.book.author?.name}
+                        {favorite?.book.author?.name}
                       </Typography>
                       <Box
                         sx={{
@@ -148,7 +138,7 @@ export default function UserFavorites() {
                         }}
                       >
                         <Button
-                          onClick={() => removeFavorite(book.book.id)}
+                          onClick={() => deleteFavorite(favorite.book.id)}
                           color="success"
                         >
                           Desfavoritar
@@ -164,7 +154,7 @@ export default function UserFavorites() {
                     }}
                   >
                     <Button
-                      onClick={() => removeFavorite(book.book.id)}
+                      onClick={() => deleteFavorite(favorite.book.id)}
                       color="success"
                     >
                       Desfavoritar
@@ -176,7 +166,7 @@ export default function UserFavorites() {
           )}
         </Grid>
       </Paper>
-      <BackDrop open={loading} />
+      <BackDrop open={getFavorites.loading || removeFavorite.loading} />
     </Container>
   );
 }

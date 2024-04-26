@@ -1,21 +1,21 @@
-import baseURL from "./config";
+import { gql } from "@apollo/client";
 
-const getCategories = async () => {
-  try {
-    const response = await baseURL.get("/categories");
-    return response.data;
-  } catch (err) {
-    return err;
+const GET_CATEGORIES = gql`
+  query {
+    findAllCategories {
+      name
+      id
+    }
   }
-};
+`;
 
-const createCategory = async (data) => {
-  try {
-    const response = await baseURL.post("/categories", { name: data });
-    return response.data;
-  } catch (err) {
-    return err;
+const CREATE_CATEGORY = gql`
+  mutation CreateCategory($name: String!) {
+    createCategory(name: $name) {
+      name
+      id
+    }
   }
-};
+`;
 
-export { getCategories, createCategory };
+export { GET_CATEGORIES, CREATE_CATEGORY };

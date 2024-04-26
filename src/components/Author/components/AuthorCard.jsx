@@ -10,21 +10,21 @@ import {
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context";
-import { deleteAuthor } from "../../../service";
+import { DELETE_AUTHOR } from "../../../service";
+import { useMutation } from "@apollo/client";
 
 export default function AuthorForm(props) {
   const { author } = props;
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const [deleteAuthor, { error }] = useMutation(DELETE_AUTHOR);
+
   const handleDelete = async () => {
-    try {
-      await deleteAuthor(author.id);
-      navigate("/author", { state: { openSnackbar: true } });
-    } catch (err) {
-      return err;
-    }
+    await deleteAuthor({ variables: { id: `${author.id}` } });
+    if (!error) navigate("/author", { state: { openSnackbar: true } });
   };
+  console.log(author);
 
   return (
     <Grid item xs={12} lg={props.lg || 3}>
@@ -77,7 +77,7 @@ export default function AuthorForm(props) {
             </Button>
           ) : (
             <>
-              {user?.id === author.user_id && (
+              {user?.id == author.user.id && (
                 <Button>
                   <Link
                     style={{ color: "darkolivegreen" }}
@@ -87,7 +87,7 @@ export default function AuthorForm(props) {
                   </Link>
                 </Button>
               )}
-              {user?.id === author.user_id && (
+              {user?.id == author.user.id && (
                 <Button
                   sx={{
                     color: "darkolivegreen",

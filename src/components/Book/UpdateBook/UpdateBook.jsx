@@ -2,30 +2,22 @@ import { Container, Paper, Box, Typography } from "@mui/material";
 import { BookForm } from "../components";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getBook } from "../../../service";
+import { GET_BOOK_BY_ID } from "../../../service";
 import { BackDrop } from "../../Utils";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useQuery } from "@apollo/client";
 
 export default function UpdateBook() {
-  const [loading, setLoading] = useState(false);
   const [book, setBook] = useState();
   const { bookId } = useParams();
+  const { data, loading } = useQuery(GET_BOOK_BY_ID, {
+    variables: { id: bookId },
+  });
   const matches = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
-    const fetchAuthor = async () => {
-      try {
-        setLoading(true);
-        const response = await getBook(bookId);
-        setBook(response?.book);
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAuthor();
-  }, []);
+    setBook(data?.findOneBook);
+  }, [data]);
 
   return (
     <Container

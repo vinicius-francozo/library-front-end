@@ -1,42 +1,47 @@
-export { login } from "./auth";
+export { LOGIN_REQUEST } from "./auth";
 export {
-  createAuthor,
-  getAuthors,
-  getAuthor,
-  updateAuthor,
-  deleteAuthor,
-  getPaginatedAuthors,
+  CREATE_AUTHOR,
+  GET_AUTHORS,
+  GET_AUTHOR_BY_ID,
+  UPDATE_AUTHOR,
+  DELETE_AUTHOR,
+  GET_AUTHORS_PAGINATED,
 } from "./authors";
 
 export {
-  createBook,
-  deleteBook,
-  getBook,
-  getBooks,
-  updateBook,
-  getPaginatedBooks,
-  getBooksByName,
+  CREATE_BOOK,
+  DELETE_BOOK,
+  GET_BOOK_BY_ID,
+  GET_BOOKS,
+  UPDATE_BOOK,
+  GET_BOOKS_PAGINATED,
+  GET_BOOKS_BY_NAME,
 } from "./books";
 
-export { getCategories, createCategory } from "./categories";
-
-export { favorite, getFavorites, unfavorite, getFavorite } from "./favorites";
+export { GET_CATEGORIES, CREATE_CATEGORY } from "./categories";
 
 export {
-  confirmPurchase,
-  createCheckoutOrder,
-  deleteFromCheckout,
-  getCheckout,
-  getRentals,
-  returnBook,
-  getOneCheckout,
+  CREATE_FAVORITE,
+  GET_FAVORITES,
+  REMOVE_FAVORITE,
+  GET_FAVORITE,
+} from "./favorites";
+
+export {
+  CONFIRM_PURCHASE,
+  CREATE_CHECKOUT_ORDER,
+  DELETE_FROM_CHECKOUT,
+  GET_CHECKOUT,
+  GET_RENTALS,
+  RETURN_BOOK,
+  GET_ONE_CHECKOUT_OR_RENTED,
 } from "./rents";
 
 export {
-  createReview,
-  deleteReview,
-  getUserReviews,
-  updateReview,
+  CREATE_REVIEW,
+  DELETE_REVIEW,
+  GET_USER_REVIEWS,
+  UPDATE_REVIEW,
 } from "./reviews";
 
-export { changeImage, createUser, getUser, updateUser } from "./users";
+export { CHANGE_IMAGE, CREATE_USER, GET_USER, UPDATE_USER } from "./users";

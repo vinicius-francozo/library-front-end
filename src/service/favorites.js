@@ -1,39 +1,37 @@
-import baseURL from "./config";
+import { gql } from "@apollo/client";
 
-const getFavorites = async () => {
-  try {
-    const response = await baseURL.get("/favorites");
-    return response.data;
-  } catch (err) {
-    return err;
+const GET_FAVORITES = gql`
+  query {
+    getUserFavorites {
+      id
+      book {
+        id
+        title
+        cover
+        author {
+          name
+        }
+      }
+    }
   }
-};
+`;
 
-const getFavorite = async (bookId) => {
-  try {
-    const response = await baseURL.get(`/favorites/${bookId}`);
-    return response.data;
-  } catch (err) {
-    return err;
+const GET_FAVORITE = gql`
+  query GetOneFavorite($bookId: String!) {
+    getFavoriteByUserAndBookId(bookId: $bookId)
   }
-};
+`;
 
-const favorite = async (bookId) => {
-  try {
-    const response = await baseURL.post(`/favorites/${bookId}`);
-    return response.data;
-  } catch (err) {
-    return err;
+const CREATE_FAVORITE = gql`
+  mutation CreateFavorite($bookId: String!) {
+    createFavorite(bookId: $bookId)
   }
-};
+`;
 
-const unfavorite = async (bookId) => {
-  try {
-    const response = await baseURL.delete(`/favorites/${bookId}`);
-    return response.data;
-  } catch (err) {
-    return err;
+const REMOVE_FAVORITE = gql`
+  mutation DeleteFavorite($bookId: String!) {
+    removeFavorite(bookId: $bookId)
   }
-};
+`;
 
-export { getFavorites, favorite, unfavorite, getFavorite };
+export { GET_FAVORITES, CREATE_FAVORITE, REMOVE_FAVORITE, GET_FAVORITE };

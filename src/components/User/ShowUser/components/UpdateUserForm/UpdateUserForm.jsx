@@ -14,15 +14,20 @@ import { useAuth } from "../../../../../context";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect, useRef, useState } from "react";
 import schema from "./schema";
-import { changeImage, getUser, updateUser } from "../../../../../service";
+import { CHANGE_IMAGE, GET_USER, UPDATE_USER } from "../../../../../service";
+import { useMutation, useQuery } from "@apollo/client";
 
 export default function UpdateUserForm() {
   const [userData, setUserData] = useState();
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const matches = useMediaQuery("(max-width:600px)");
 
   const { user } = useAuth();
+  const { refetch, data, loading } = useQuery(GET_USER, {
+    variables: { id: `${user?.id}` },
+  });
+  const [updateUser, updateUserMutation] = useMutation(UPDATE_USER);
+  const [changeImage, changeImageMutation] = useMutation(CHANGE_IMAGE);
 
   const inputFileRef = useRef();
 
@@ -34,16 +39,7 @@ export default function UpdateUserForm() {
   } = useForm({ resolver: yupResolver(schema) });
 
   const onSubmit = async (data) => {
-    try {
-      setLoading(true);
-      const response = await updateUser(data, user?.id);
-      setUserData(response?.users);
-      setOpen(true);
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
-    }
+    updateUser({ variables: data });
   };
 
   const Img = styled("img")({
@@ -57,44 +53,24 @@ export default function UpdateUserForm() {
   useEffect(() => {
     if (userData) {
       for (const [key, value] of Object.entries(userData)) {
-        if (key !== "createdAt" && key !== "updatedAt" && key !== "id") {
-          setValue(key, value);
-        }
+        setValue(key, value || updateUserMutation?.data?.updateUser[key]);
       }
     }
-  }, [userData]);
+
+    if (updateUserMutation.data || changeImageMutation.data) {
+      setOpen(true);
+      refetch();
+    }
+  }, [userData, updateUserMutation.data, changeImageMutation.data]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setLoading(true);
-        if (user?.id) {
-          const response = await getUser(user?.id);
-          setUserData(response);
-        }
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [user]);
+    if (!data && user) refetch();
+    if (data) setUserData(data.findOneUser);
+  }, [user, data]);
 
   const handleUpdateImage = async (event) => {
     const file = event.target.files[0];
-    const formData = new FormData();
-    formData.append("image", file);
-    try {
-      setLoading(true);
-      const response = await changeImage(formData, user?.id);
-      setUserData(response?.users);
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
-    }
+    changeImage({ variables: { image: file } });
   };
 
   const handleImgClick = () => {

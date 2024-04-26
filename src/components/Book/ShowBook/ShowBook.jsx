@@ -3,12 +3,12 @@ import { BookCard } from "../components";
 import { BookComment, CreateBookComment } from "./components";
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getBook } from "../../../service";
+import { GET_BOOK_BY_ID } from "../../../service";
 import { BackDrop, Snackbar } from "../../Utils";
+import { useQuery } from "@apollo/client";
 
 export default function ShowBook() {
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
   const [book, setBook] = useState();
   const [comments, setComments] = useState();
   const [open, setOpen] = useState(
@@ -16,21 +16,14 @@ export default function ShowBook() {
   );
   const { bookId } = useParams();
 
+  const { data, loading } = useQuery(GET_BOOK_BY_ID, {
+    variables: { id: bookId },
+  });
+
   useEffect(() => {
-    const fetchBook = async () => {
-      try {
-        setLoading(true);
-        const response = await getBook(bookId);
-        setBook(response?.books);
-        setComments(response?.books?.reviews);
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBook();
-  }, []);
+    setBook(data?.findOneBook);
+    setComments(data?.findOneBook.reviews);
+  }, [data]);
 
   return (
     <Grid

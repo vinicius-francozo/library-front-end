@@ -4,39 +4,55 @@ import { BackDrop, CustomTextField } from "../../../../Utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import schema from "./schema";
 import "./CreateUserForm.css";
-import { createUser, login } from "../../../../../service";
+import { CREATE_USER } from "../../../../../service";
+import { useEffect, useState } from "react";
+import { useMutation } from "@apollo/client";
+import { LOGIN_REQUEST } from "../../../../../service";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 
 export default function CreateUserForm({ setOpen }) {
-  const [loading, setLoading] = useState();
-
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
+  const [loading, setLoading] = useState(false);
+  const [login, loginMutation] = useMutation(LOGIN_REQUEST);
+  const [createUser, createUserMutation] = useMutation(CREATE_USER);
 
   const navigate = useNavigate();
 
-  const onSubmit = async (data) => {
-    try {
-      setLoading(true);
-      const createResponse = await createUser(data);
-      if (createResponse?.response?.status == 500) {
-        throw new Error();
+  const onSubmit = async (userData) => {
+    await createUser({
+      variables: {
+        username: userData.username,
+        password: userData.password,
+        confirmPassword: userData.confirmPassword,
+        email: userData.email,
+      },
+    });
+    if (!createUserMutation.loading) {
+      await login({
+        variables: { username: userData.username, password: userData.password },
+      });
+
+      if (loginMutation.data) {
+        localStorage.setItem("token", loginMutation.data.login);
+        navigate("/", { state: { openSnackbar: true } });
+        navigate(0);
       }
-      const response = await login(data.username, data.password);
-      console.log(response)
-      localStorage.setItem("token", response);
-      navigate("/", { state: { openSnackbar: true } });
-      navigate(0);
-    } catch (err) {
-      setOpen(true);
-    } finally {
-      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setLoading(loginMutation.loading || createUserMutation.loading);
+    if ((createUserMutation.error, loginMutation.error)) setOpen(true);
+  }, [
+    loginMutation.loading,
+    createUserMutation.loading,
+    loginMutation.error,
+    createUserMutation.error,
+  ]);
 
   return (
     <>

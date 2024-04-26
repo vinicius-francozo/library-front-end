@@ -5,9 +5,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import schema from "./schema";
 import "./AuthorForm.css";
 import { useEffect, useState } from "react";
-import { createAuthor, updateAuthor } from "../../../../service";
+import { CREATE_AUTHOR, GET_AUTHORS } from "../../../../service";
 import { useNavigate } from "react-router-dom";
 import { BackDrop, Snackbar } from "../../../Utils";
+import { useMutation } from "@apollo/client";
+import {
+  GET_AUTHORS_PAGINATED,
+  GET_AUTHOR_BY_ID,
+  UPDATE_AUTHOR,
+} from "../../../../service/authors";
 
 export default function AuthorForm({ author, method = "POST" }) {
   const navigate = useNavigate();
@@ -20,29 +26,35 @@ export default function AuthorForm({ author, method = "POST" }) {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  const onSubmit = async (data) => {
-    const formData = new FormData();
-    for (const item of Object.entries(data)) {
-      if (item[0] !== "picture") {
-        formData.append(item[0], item[1]);
-      }
+  const [createAuthorFn, createAuthor] = useMutation(CREATE_AUTHOR, {
+    refetchQueries: [GET_AUTHORS_PAGINATED, GET_AUTHORS],
+  });
+
+  const [updateAuthorFn, updateAuthor] = useMutation(UPDATE_AUTHOR, {
+    refetchQueries: [GET_AUTHOR_BY_ID],
+  });
+
+  const onSubmit = async (authorData) => {
+    if (typeof authorData.picture !== "string") {
+      authorData.picture = authorData.picture[0];
+    } else {
+      delete authorData.picture;
     }
-    formData.append(
-      "image",
-      typeof data.picture === "string" ? data.picture : data.picture[0]
-    );
 
     try {
       setLoading(true);
       if (method === "POST") {
-        const response = await createAuthor(formData);
-        if (response?.request?.status === 422) {
-          setOpen(true);
-        } else {
-          navigate("/author", { state: { openSnackbar: true } });
-        }
+        await createAuthorFn({ variables: { ...authorData } });
+        if (createAuthor.error) throw new Error();
+        navigate("/author", { state: { openSnackbar: true } });
       } else {
-        await updateAuthor(author.id, formData);
+        await updateAuthorFn({
+          variables: {
+            id: author.id,
+            ...authorData,
+          },
+        });
+        if (updateAuthor.error) throw new Error();
         navigate(`/author/show/${author.id}`, {
           state: { openSnackbar: true },
         });

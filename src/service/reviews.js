@@ -1,39 +1,39 @@
-import baseURL from "./config";
+import { gql } from "@apollo/client";
 
-const getUserReviews = async (userId) => {
-  try {
-    const response = await baseURL.get(`/reviews/${userId}`);
-    return response.data;
-  } catch (err) {
-    return err;
+const GET_USER_REVIEWS = gql`
+  query {
+    getUserReviews {
+      text
+      id
+      rate
+    }
   }
-};
+`;
 
-const createReview = async (data, bookId) => {
-  try {
-    const response = await baseURL.post(`/reviews/${bookId}`, { ...data });
-    return response.data;
-  } catch (err) {
-    return err;
+const CREATE_REVIEW = gql`
+  mutation CreateReview($bookId: String!, $rate: Float!, $text: String!) {
+    createReview(bookId: $bookId, data: { rate: $rate, text: $text }) {
+      text
+      id
+      rate
+    }
   }
-};
+`;
 
-const updateReview = async (data, reviewId) => {
-  try {
-    const response = await baseURL.put(`/reviews/${reviewId}`, { ...data });
-    return response.data;
-  } catch (err) {
-    return err;
+const UPDATE_REVIEW = gql`
+  mutation UpdateReview($reviewId: String!, $rate: Float, $text: String) {
+    updateReview(id: $reviewId, data: { rate: $rate, text: $text }) {
+      text
+      id
+      rate
+    }
   }
-};
+`;
 
-const deleteReview = async (reviewId) => {
-  try {
-    const response = await baseURL.delete(`/reviews/${reviewId}`);
-    return response.data;
-  } catch (err) {
-    return err;
+const DELETE_REVIEW = gql`
+  mutation DeleteReview($reviewId: String!) {
+    deleteReview(id: $reviewId)
   }
-};
+`;
 
-export { createReview, deleteReview, getUserReviews, updateReview };
+export { CREATE_REVIEW, DELETE_REVIEW, GET_USER_REVIEWS, UPDATE_REVIEW };

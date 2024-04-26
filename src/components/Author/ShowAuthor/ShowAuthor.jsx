@@ -2,32 +2,25 @@ import { Grid } from "@mui/material";
 import { AuthorCard } from "../components";
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getAuthor } from "../../../service";
+import { GET_AUTHOR_BY_ID } from "../../../service";
 import { BackDrop, Snackbar } from "../../Utils";
+import { useQuery } from "@apollo/client";
 
 export default function ShowAuthor() {
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
   const [author, setAuthor] = useState();
   const [open, setOpen] = useState(
     location?.state?.openSnackbar ? true : false
   );
   const { authorId } = useParams();
 
+  const { data, loading } = useQuery(GET_AUTHOR_BY_ID, {
+    variables: { id: authorId },
+  });
+
   useEffect(() => {
-    const fetchAuthor = async () => {
-      try {
-        setLoading(true);
-        const response = await getAuthor(authorId);
-        setAuthor(response?.authors);
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAuthor();
-  }, []);
+    setAuthor(data?.findOneAuthor);
+  }, [data]);
 
   return (
     <Grid

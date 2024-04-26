@@ -15,66 +15,57 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useEffect, useState } from "react";
 import {
-  deleteFromCheckout,
-  getCheckout,
-  confirmPurchase,
+  DELETE_FROM_CHECKOUT,
+  GET_CHECKOUT,
+  CONFIRM_PURCHASE,
 } from "../../service";
 import { BackDrop, Snackbar } from "../Utils";
 import { useAuth } from "../../context";
+import { useMutation, useQuery } from "@apollo/client";
 
 export default function Checkout() {
   const matches = useMediaQuery("(max-width:600px)");
   const [cart, setCart] = useState();
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { setUser } = useAuth();
 
+  const listCheckout = useQuery(GET_CHECKOUT);
+  const [confirmPurchaseFn, confirmPurchase] = useMutation(CONFIRM_PURCHASE, {
+    refetchQueries: [GET_CHECKOUT],
+  });
+  const [removeBook, removeFromCheckout] = useMutation(DELETE_FROM_CHECKOUT, {
+    refetchQueries: [GET_CHECKOUT],
+  });
+
   const fetchCheckout = async () => {
-    try {
-      setLoading(true);
-      const response = await getCheckout();
-      setCart(response.rents);
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
-    }
+    await listCheckout.refetch();
+    setCart(listCheckout?.data?.listCheckout);
   };
 
   const removeItem = async (id) => {
-    try {
-      setLoading(true);
-      await deleteFromCheckout(id);
+    await removeBook({ variables: { rentId: id } });
+    if (!removeFromCheckout.error) {
       setUser((prevUser) => {
         return { ...prevUser, checkout: --prevUser.checkout };
       });
       fetchCheckout();
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
     }
   };
 
-  const confirmBookPurchase = async (id) => {
-    try {
-      setLoading(true);
-      await confirmPurchase(id);
+  const confirmBookPurchase = async () => {
+    await confirmPurchaseFn();
+    if (!confirmPurchase.error) {
       setUser((prevUser) => {
         return { ...prevUser, checkout: --prevUser.checkout };
       });
       setOpen(true);
       fetchCheckout();
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchCheckout();
-  }, []);
+  }, [listCheckout.data]);
 
   return (
     <Container
@@ -251,7 +242,13 @@ export default function Checkout() {
           </>
         )}
       </Paper>
-      <BackDrop open={loading} />
+      <BackDrop
+        open={
+          listCheckout.loading ||
+          confirmPurchase.loading ||
+          removeFromCheckout.loading
+        }
+      />
       <Snackbar
         message={"Livros alugados com sucesso! confira em Meus Livros"}
         open={open}

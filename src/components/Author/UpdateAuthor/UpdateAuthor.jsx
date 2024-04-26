@@ -2,27 +2,20 @@ import { Container, Paper, Box, Typography } from "@mui/material";
 import { AuthorForm } from "../components";
 import { useEffect, useState } from "react";
 import { BackDrop } from "../../Utils";
-import { getAuthor } from "../../../service";
+import { GET_AUTHOR_BY_ID } from "../../../service";
 import { useParams } from "react-router-dom";
+import { useQuery } from "@apollo/client";
 
 export default function UpdateBook() {
-  const [loading, setLoading] = useState(false);
   const [author, setAuthor] = useState();
   const { authorId } = useParams();
+  const { data, loading } = useQuery(GET_AUTHOR_BY_ID, {
+    variables: { id: authorId },
+  });
+
   useEffect(() => {
-    const fetchAuthor = async () => {
-      try {
-        setLoading(true);
-        const response = await getAuthor(authorId);
-        setAuthor(response?.authors);
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAuthor();
-  }, []);
+    setAuthor(data?.findOneAuthor);
+  }, [data]);
 
   return (
     <Container sx={{ height: "100vh", paddingBlock: 2 }}>

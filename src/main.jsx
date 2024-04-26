@@ -23,6 +23,8 @@ import {
   UserFavorite,
 } from "./components";
 import { AuthProvider } from "./context";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
 const router = createBrowserRouter([
   {
@@ -125,11 +127,25 @@ const router = createBrowserRouter([
   },
 ]);
 
+const token = localStorage.getItem("token");
+const client = new ApolloClient({
+  link: createUploadLink({
+    uri: import.meta.env.VITE_REACT_APP_BASE_URL_AND_PORT_AND_SUFFIX,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "apollo-require-preflight": true,
+    },
+  }),
+  cache: new InMemoryCache(),
+});
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
-      <CssBaseline />
-      <RouterProvider router={router} />
+      <ApolloProvider client={client}>
+        <CssBaseline />
+        <RouterProvider router={router} />
+      </ApolloProvider>
     </AuthProvider>
   </React.StrictMode>
 );

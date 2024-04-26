@@ -1,70 +1,109 @@
-import baseURL from "./config";
+import { gql } from "@apollo/client";
 
-const getAuthors = async () => {
-  try {
-    const response = await baseURL.get("/authors");
-    return response.data;
-  } catch (err) {
-    return err;
+const GET_AUTHORS = gql`
+  query {
+    findAllAuthors {
+      id
+      name
+    }
   }
-};
+`;
 
-const getPaginatedAuthors = async (perPage, page) => {
-  try {
-    const response = await baseURL.get(
-      `/authors/perPage?perPage=${perPage}&page=${page}`
-    );
-    return response.data;
-  } catch (err) {
-    return err;
+const GET_AUTHORS_PAGINATED = gql`
+  query GetAuthorsPaginated($perPage: String!, $page: String!) {
+    authorPerPage(perPage: $perPage, page: $page) {
+      name
+      surname
+      birth_date
+      country
+      picture
+      description
+      id
+      user {
+        id
+      }
+    }
   }
-};
+`;
 
-const createAuthor = async (data) => {
-  try {
-    const response = await baseURL.post("/authors", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return response;
-  } catch (err) {
-    return err;
+const CREATE_AUTHOR = gql`
+  mutation CreateAuthor(
+    $name: String!
+    $surname: String!
+    $birth_date: String!
+    $country: String!
+    $picture: Upload!
+    $description: String!
+  ) {
+    createAuthor(
+      data: {
+        name: $name
+        surname: $surname
+        birth_date: $birth_date
+        country: $country
+        picture: $picture
+        description: $description
+      }
+    ) {
+      id
+    }
   }
-};
+`;
 
-const getAuthor = async (id) => {
-  try {
-    const response = await baseURL.get(`/authors/${id}`);
-    return response.data;
-  } catch (err) {
-    return err;
+const GET_AUTHOR_BY_ID = gql`
+  query GetAuthor($id: String!) {
+    findOneAuthor(id: $id) {
+      id
+      name
+      surname
+      birth_date
+      country
+      picture
+      description
+      user {
+        id
+      }
+    }
   }
-};
+`;
 
-const updateAuthor = async (id, data) => {
-  try {
-    const response = await baseURL.put(`/authors/${id}`, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return response.data;
-  } catch (err) {
-    return err;
+const UPDATE_AUTHOR = gql`
+  mutation UpdateAuthor(
+    $id: String!
+    $name: String
+    $surname: String
+    $birth_date: String
+    $country: String
+    $picture: Upload
+    $description: String
+  ) {
+    updateAuthor(
+      id: $id
+      data: {
+        name: $name
+        surname: $surname
+        birth_date: $birth_date
+        country: $country
+        picture: $picture
+        description: $description
+      }
+    ) {
+      name
+    }
   }
-};
+`;
 
-const deleteAuthor = async (id) => {
-  try {
-    const response = await baseURL.delete(`/authors/${id}`);
-    return response;
-  } catch (err) {
-    return err;
+const DELETE_AUTHOR = gql`
+  mutation DeleteAuthor($id: String!) {
+    deleteAuthor(id: $id)
   }
-};
+`;
 
 export {
-  getAuthors,
-  createAuthor,
-  getAuthor,
-  updateAuthor,
-  deleteAuthor,
-  getPaginatedAuthors,
+  GET_AUTHORS,
+  CREATE_AUTHOR,
+  GET_AUTHOR_BY_ID,
+  UPDATE_AUTHOR,
+  DELETE_AUTHOR,
+  GET_AUTHORS_PAGINATED,
 };

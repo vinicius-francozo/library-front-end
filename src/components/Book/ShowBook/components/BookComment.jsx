@@ -1,50 +1,43 @@
 import { Button, Grid, Rating, Typography } from "@mui/material";
 import { useAuth } from "../../../../context";
 import { useRef, useState } from "react";
-import { deleteReview, updateReview } from "../../../../service";
+import { DELETE_REVIEW, UPDATE_REVIEW } from "../../../../service";
 import { useNavigate } from "react-router-dom";
 import { BackDrop } from "../../../Utils";
 import "./BookComment.css";
+import { useMutation } from "@apollo/client";
 
 export default function BookComment({ comment }) {
-  const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [rating, setRating] = useState();
   const typoRef = useRef();
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const [updateReview, { loading }] = useMutation(UPDATE_REVIEW);
+  const [deleteReview] = useMutation(DELETE_REVIEW);
+
   const handleDelete = async (reviewId) => {
-    try {
-      setLoading(true);
-      await deleteReview(reviewId);
-      navigate(0);
-    } catch (err) {
-      return err;
-    } finally {
-      setLoading(false);
-    }
+    await deleteReview({ variables: { reviewId: `${reviewId}` } });
+    navigate(0);
   };
 
   const handleUpdate = async (reviewId) => {
     try {
-      setLoading(true);
       if (!updating) {
         setUpdating((prev) => !prev);
       } else {
-        await updateReview(
-          {
+        await updateReview({
+          variables: {
+            reviewId,
             text: typoRef.current.textContent,
             rate: rating || comment?.rate,
           },
-          reviewId
-        );
+        });
         setUpdating((prev) => !prev);
       }
     } catch (err) {
       return err;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -85,7 +78,7 @@ export default function BookComment({ comment }) {
           }}
         />
       </Grid>
-      {(user?.id === comment?.user_id || user?.isAdmin) && (
+      {(user?.id === comment?.user.id || user?.isAdmin) && (
         <Grid item>
           <Button
             color="error"
@@ -96,7 +89,7 @@ export default function BookComment({ comment }) {
           </Button>
         </Grid>
       )}
-      {user?.id === comment?.user_id && (
+      {user?.id === comment?.user.id && (
         <Grid item ml={2}>
           <Button
             color={updating ? "success" : "info"}

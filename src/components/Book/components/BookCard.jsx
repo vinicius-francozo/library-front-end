@@ -16,18 +16,19 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../../context";
 import {
-  createCheckoutOrder,
-  deleteBook,
-  favorite,
-  getFavorite,
-  getOneCheckout,
-  unfavorite,
+  GET_ONE_CHECKOUT_OR_RENTED,
+  CREATE_CHECKOUT_ORDER,
+  DELETE_BOOK,
+  CREATE_FAVORITE,
+  GET_FAVORITE,
+  REMOVE_FAVORITE,
+  GET_CHECKOUT,
 } from "../../../service";
 import { useEffect, useState } from "react";
 import { BackDrop } from "../../Utils";
+import { useMutation, useQuery } from "@apollo/client";
 
 export default function BookCard(props) {
-  const [loading, setLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState();
   const [isOrdered, setIsOrdered] = useState(false);
   const { book } = props;
@@ -35,42 +36,51 @@ export default function BookCard(props) {
   const { bookId } = useParams();
   const navigate = useNavigate();
 
+  const getOneCheckout = useQuery(GET_ONE_CHECKOUT_OR_RENTED, {
+    variables: { bookId: `${book.id}` },
+  });
+
+  const [createCheckoutOrder, createCheckout] = useMutation(
+    CREATE_CHECKOUT_ORDER,
+    { refetchQueries: [GET_ONE_CHECKOUT_OR_RENTED, GET_CHECKOUT] }
+  );
+
+  const [createFavoriteFn, createFavorite] = useMutation(CREATE_FAVORITE);
+
+  const [removeFavoriteFn, removeFavorite] = useMutation(REMOVE_FAVORITE);
+
+  const [deleteBookFn, deleteBook] = useMutation(DELETE_BOOK);
+
+  const getFavorites = useQuery(GET_FAVORITE, {
+    variables: { bookId: book?.id },
+  });
+
   const handleDelete = async () => {
-    try {
-      await deleteBook(book.id);
-      navigate("/book", { state: { openSnackbar: true } });
-    } catch (err) {
-      return err;
-    }
+    await deleteBookFn({ variables: { id: book.id } });
+    if (!deleteBook.error) navigate("/book", { state: { openSnackbar: true } });
   };
 
   const addCheckout = async (book_id) => {
-    try {
-      await createCheckoutOrder(book_id);
+    await createCheckoutOrder({ variables: { bookId: book_id } });
+    if (!createCheckout.error) {
       setIsOrdered(true);
       setUser((prevUser) => {
         return { ...prevUser, checkout: ++prevUser.checkout };
       });
-    } catch (err) {
-      return err;
     }
   };
 
   const addFavorite = async (book_id) => {
-    try {
-      await favorite(book_id);
+    await createFavoriteFn({ variables: { bookId: book_id } });
+    if (!createFavorite.error) {
       setIsFavorite(true);
-    } catch (err) {
-      return err;
     }
   };
 
-  const removeFavorite = async (book_id) => {
-    try {
-      await unfavorite(book_id);
+  const deleteFavorite = async (book_id) => {
+    await removeFavoriteFn({ variables: { bookId: book_id } });
+    if (!removeFavorite.error) {
       setIsFavorite(false);
-    } catch (err) {
-      return err;
     }
   };
 
@@ -80,28 +90,21 @@ export default function BookCard(props) {
 
   useEffect(() => {
     const fetchFavorite = async (book_id) => {
-      try {
-        setLoading(true);
-        const response = await getFavorite(book_id);
-        if (response?.favorites) setIsFavorite(true);
-      } catch (err) {
-        return err;
-      } finally {
-        setLoading(false);
+      if (book_id && !getFavorites.data) {
+        return getFavorites.refetch();
+      }
+
+      if (!getFavorites.error) {
+        setIsFavorite(getFavorites.data.getFavoriteByUserAndBookId);
       }
     };
 
     fetchFavorite(book?.id);
-  }, [book]);
+  }, [book, getFavorites?.data]);
 
   useEffect(() => {
-    const fetchCheckout = async (book_id) => {
-      const response = await getOneCheckout(book_id);
-      if (response?.rents) setIsOrdered(true);
-    };
-
-    fetchCheckout(book?.id);
-  }, []);
+    if (getOneCheckout?.data?.listRentedOrCheckout.length) setIsOrdered(true);
+  }, [book, getOneCheckout.data]);
 
   return (
     <Grid item xs={12} lg={props.lg || 3}>
@@ -168,7 +171,7 @@ export default function BookCard(props) {
           ) : isFavorite ? (
             <IconButton
               aria-label="remove from favorites"
-              onClick={() => removeFavorite(book?.id)}
+              onClick={() => deleteFavorite(book?.id)}
             >
               <FavoriteIcon />
             </IconButton>
@@ -203,7 +206,7 @@ export default function BookCard(props) {
             </Button>
           ) : (
             <>
-              {user?.id === book.user_id && (
+              {(user?.id == book.user.id || user?.isAdmin) && (
                 <Button>
                   <Link
                     style={{ color: "darkolivegreen" }}
@@ -213,7 +216,7 @@ export default function BookCard(props) {
                   </Link>
                 </Button>
               )}
-              {user?.id === book.user_id && (
+              {(user?.id == book.user.id || user?.isAdmin) && (
                 <Button
                   sx={{
                     color: "darkolivegreen",
@@ -233,7 +236,13 @@ export default function BookCard(props) {
           )}
         </CardActions>
       </Card>
-      <BackDrop open={loading} />
+      <BackDrop
+        open={
+          getOneCheckout.loading ||
+          createCheckout.loading ||
+          getFavorites.loading
+        }
+      />
     </Grid>
   );
 }
